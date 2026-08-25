@@ -90,9 +90,9 @@ const mw = view(Inputs.range([d3.min(mws), d3.max(mws)], {
 return {mws,mw};
 }});
 
-define({id: "73a9ca08", inputs: ["mws","mw","season"], outputs: ["nearest","src"], body: (mws,mw,season) => {
+define({id: "72f4ef98", inputs: ["mws","mw","season"], outputs: ["nearest","src"], body: (mws,mw,season) => {
 const nearest = mws.reduce((best, v) => Math.abs(v - mw) < Math.abs(best - mw) ? v : best, mws[0]);
-const src = `../grids/grid_${season}_mw${nearest}.png`;
+const src = `./grids/grid_${season}_mw${nearest}.png`;
 return {nearest,src};
 }});
 
@@ -140,7 +140,7 @@ html`<img src="${src}" style="max-width:100%;height:auto;" alt="Position grid ${
 <div class="observablehq observablehq--block"><!--:71646a04:--></div>
 <div class="observablehq observablehq--block"><!--:966924ec:--></div>
 <div class="observablehq observablehq--block"><!--:0723fc42:--></div>
-<div class="observablehq observablehq--block"><!--:73a9ca08:--></div>
+<div class="observablehq observablehq--block"><!--:72f4ef98:--></div>
 <h1 id="position-grid" tabindex="-1"><a class="observablehq-header-anchor" href="#position-grid">Position Grid — <observablehq-loading></observablehq-loading><!--:8f8e24f6:--></a></h1>
 <p><small>Matchweek <observablehq-loading></observablehq-loading><!--:4ad71c2c:--> · probability of finishing in each position (10,000 simulations)</small></p>
 <p><observablehq-loading></observablehq-loading><!--:f02fe96f:--></p>
@@ -148,7 +148,7 @@ html`<img src="${src}" style="max-width:100%;height:auto;" alt="Position grid ${
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="prev" href="./"><span>English Football</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T09:08:20">Aug 25, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T09:12:54">Aug 25, 2026</a>.</div>
 </footer>
 </div>
 </body>
