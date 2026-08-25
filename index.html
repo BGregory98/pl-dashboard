@@ -255,6 +255,88 @@ Plot.plot({
 return {braid};
 }});
 
+define({id: "6edf2c4e", inputs: ["Plot","n","sd","latest","showLabels","short","maxMw","d3","width","labelMr","display"], body: async (Plot,n,sd,latest,showLabels,short,maxMw,d3,width,labelMr,display) => {
+display(await(
+Plot.plot({
+  marks: [
+    Plot.ruleY([4.5], {stroke: "#4a90d9", strokeOpacity: 0.2}),
+    Plot.ruleY([n - 3 + 0.5], {stroke: "#d94a4a", strokeOpacity: 0.2}),
+    Plot.line(sd, {
+      x: "mw",
+      y: "exp_pos",
+      stroke: "club",
+      curve: "bump-x",
+      strokeWidth: 2.5,
+      strokeOpacity: 0.7,
+      title: d => `${d.club}\nMW ${d.mw}: expected pos ${d.exp_pos.toFixed(1)}, xPts ${d.exp_pts.toFixed(1)}`
+    }),
+    Plot.dot(latest, {
+      x: "mw",
+      y: "exp_pos",
+      fill: "club",
+      r: 4
+    }),
+    showLabels ? Plot.text(latest, {
+      x: "mw",
+      y: "exp_pos",
+      text: d => short(d.club),
+      dx: 10,
+      textAnchor: "start",
+      fontSize: 11
+    }) : null
+  ].filter(Boolean),
+  x: {label: "Matchweek", domain: [0, Math.max(maxMw + 4, 38)]},
+  y: {
+    reverse: true,
+    label: "Expected final position",
+    domain: [0.5, n + 0.5],
+    ticks: d3.range(1, n + 1)
+  },
+  color: {legend: false},
+  width,
+  height: Math.max(500, n * 28),
+  marginRight: labelMr
+})
+))
+}});
+
+define({id: "a4954059", inputs: ["Plot","sd","latest","showLabels","short","maxMw","width","n","labelMr","display"], body: async (Plot,sd,latest,showLabels,short,maxMw,width,n,labelMr,display) => {
+display(await(
+Plot.plot({
+  marks: [
+    Plot.line(sd, {
+      x: "mw",
+      y: "exp_pts",
+      stroke: "club",
+      strokeWidth: 2.5,
+      strokeOpacity: 0.7,
+      title: d => `${d.club}\nMW ${d.mw}: xPts ${d.exp_pts.toFixed(1)}`
+    }),
+    Plot.dot(latest, {
+      x: "mw",
+      y: "exp_pts",
+      fill: "club",
+      r: 4
+    }),
+    showLabels ? Plot.text(latest, {
+      x: "mw",
+      y: "exp_pts",
+      text: d => `${short(d.club)} ${d.exp_pts.toFixed(0)}`,
+      dx: 10,
+      textAnchor: "start",
+      fontSize: 11
+    }) : null
+  ].filter(Boolean),
+  x: {label: "Matchweek", domain: [0, Math.max(maxMw + 4, 38)]},
+  y: {label: "Projected final points"},
+  color: {legend: false},
+  width,
+  height: Math.max(400, n * 22),
+  marginRight: labelMr
+})
+))
+}});
+
 define({id: "01da39fa", inputs: ["Plot","sd","titleSet","latest","showLabels","short","width","labelMr","display"], body: async (Plot,sd,titleSet,latest,showLabels,short,width,labelMr,display) => {
 display(await(
 Plot.plot({
@@ -417,6 +499,10 @@ Plot.plot({
 <hr>
 <h2 id="position-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#position-trajectory">Position Trajectory</a></h2>
 <div class="observablehq observablehq--block"><!--:8eed031f:--></div>
+<h2 id="expected-positions" tabindex="-1"><a class="observablehq-header-anchor" href="#expected-positions">Expected Positions</a></h2>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:6edf2c4e:--></div>
+<h2 id="points-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#points-trajectory">Points Trajectory</a></h2>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:a4954059:--></div>
 <h2 id="title-race" tabindex="-1"><a class="observablehq-header-anchor" href="#title-race">Title Race</a></h2>
 <div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:01da39fa:--></div>
 <h2 id="relegation-battle" tabindex="-1"><a class="observablehq-header-anchor" href="#relegation-battle">Relegation Battle</a></h2>
@@ -424,7 +510,7 @@ Plot.plot({
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="next" href="./positions"><span>Position Grid</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-24T23:45:43">Aug 24, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-24T23:50:55">Aug 24, 2026</a>.</div>
 </footer>
 </div>
 </body>
