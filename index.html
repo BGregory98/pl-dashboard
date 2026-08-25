@@ -84,7 +84,7 @@ const season = view(Inputs.select(seasons.toReversed(), {
 return {season};
 }});
 
-define({id: "c09204d9", inputs: ["season","summary","d3","width"], outputs: ["endYear","sd","mws","maxMw","prevMw","latest","prev","prevMap","n","SHORT","short","labelMr","showLabels","titleSet","relegSet"], body: (season,summary,d3,width) => {
+define({id: "5e18fc37", inputs: ["season","summary","d3","width"], outputs: ["endYear","sd","mws","maxMw","prevMw","latest","prev","prevMap","n","SHORT","short","CLUB_COLORS","clubColor","labelMr","showLabels","clubs","colorDomain","colorRange","titleSet","relegSet"], body: (season,summary,d3,width) => {
 const endYear = parseInt(season.split("-")[0]) + 1;
 const sd = summary.filter(d => d.season_end_year === endYear);
 const mws = [...new Set(sd.map(d => d.mw))].sort((a, b) => a - b);
@@ -127,12 +127,46 @@ const SHORT = new Map([
 ]);
 const short = name => SHORT.get(name) ?? name;
 
+const CLUB_COLORS = new Map([
+  ["Arsenal", "#D6432B"], ["Aston Villa", "#591C33"],
+  ["Barnsley", "#7A2D29"], ["Birmingham City", "#4627CE"],
+  ["Blackburn Rovers", "#549BCC"], ["Blackpool", "#E68F44"],
+  ["Bolton Wanderers", "#1E2644"], ["AFC Bournemouth", "#A33022"],
+  ["Bradford City", "#866E2B"], ["Brentford", "#DB6B45"],
+  ["Brighton & Hove Albion", "#3354A1"], ["Burnley", "#632C47"],
+  ["Cardiff City", "#3E73A5"], ["Charlton Athletic", "#8F322E"],
+  ["Chelsea", "#24407B"], ["Coventry City", "#557BA2"],
+  ["Crystal Palace", "#4C67AE"], ["Derby County", "#494949"],
+  ["Everton", "#2B3580"], ["Fulham", "#1B1B1B"],
+  ["Huddersfield Town", "#325F91"], ["Hull City", "#B97B3D"],
+  ["Ipswich Town", "#516590"], ["Leeds United", "#7B7B7B"],
+  ["Leicester City", "#2A60A0"], ["Liverpool", "#B23A3C"],
+  ["Luton Town", "#D18241"], ["Manchester City", "#80A9CE"],
+  ["Manchester United", "#C44834"], ["Middlesbrough", "#9F3A2D"],
+  ["Newcastle United", "#67AFD2"], ["Norwich City", "#48A161"],
+  ["Nottingham Forest", "#B25040"], ["Oldham Athletic", "#4981C3"],
+  ["Portsmouth", "#231B6F"], ["Queens Park Rangers", "#4D4B85"],
+  ["Reading", "#4E70AC"], ["Sheffield United", "#DE7B76"],
+  ["Sheffield Wednesday", "#6075C5"], ["Southampton", "#D46659"],
+  ["Stoke City", "#C8514A"], ["Sunderland", "#D25C5F"],
+  ["Swansea City", "#5C5C5C"], ["Swindon Town", "#632622"],
+  ["Tottenham Hotspur", "#1E234B"], ["Watford", "#C3A24E"],
+  ["West Bromwich Albion", "#344F83"], ["West Ham United", "#6E313D"],
+  ["Wigan Athletic", "#3D5495"], ["Wimbledon", "#6C7FBE"],
+  ["Wolverhampton Wanderers", "#C09244"]
+]);
+const clubColor = name => CLUB_COLORS.get(name) ?? "#999";
+
 const labelMr = width < 500 ? 0 : 100;
 const showLabels = width >= 500;
 
+const clubs = [...new Set(sd.map(d => d.club))].sort();
+const colorDomain = clubs;
+const colorRange = clubs.map(clubColor);
+
 const titleSet = new Set(sd.filter(d => d.p_title > 0.01).map(d => d.club));
 const relegSet = new Set(sd.filter(d => d.p_releg > 0.05).map(d => d.club));
-return {endYear,sd,mws,maxMw,prevMw,latest,prev,prevMap,n,SHORT,short,labelMr,showLabels,titleSet,relegSet};
+return {endYear,sd,mws,maxMw,prevMw,latest,prev,prevMap,n,SHORT,short,CLUB_COLORS,clubColor,labelMr,showLabels,clubs,colorDomain,colorRange,titleSet,relegSet};
 }});
 
 define({id: "8f8e24f6", mode: "inline", inputs: ["season","display"], body: async (season,display) => {
@@ -206,7 +240,7 @@ display(wrapper);
 return {fmtPct,chg,chgPts,rowCls,tableRows,wrapper};
 }});
 
-define({id: "8eed031f", inputs: ["sd","Plot","n","maxMw","showLabels","short","d3","width","labelMr"], outputs: ["braid"], body: (sd,Plot,n,maxMw,showLabels,short,d3,width,labelMr) => {
+define({id: "afb12b0c", inputs: ["sd","Plot","n","clubColor","maxMw","showLabels","short","d3","width","labelMr"], outputs: ["braid"], body: (sd,Plot,n,clubColor,maxMw,showLabels,short,d3,width,labelMr) => {
 const braid = sd.map(d => ({
   ...d,
   pos: d.mw === 0 ? d.exp_pos : d.pos_now
@@ -219,7 +253,7 @@ Plot.plot({
     Plot.line(braid, {
       x: "mw",
       y: "pos",
-      stroke: "club",
+      stroke: d => clubColor(d.club),
       curve: "bump-x",
       strokeWidth: 2.5,
       strokeOpacity: 0.7,
@@ -228,7 +262,7 @@ Plot.plot({
     Plot.dot(braid.filter(d => d.mw === maxMw), {
       x: "mw",
       y: "pos",
-      fill: "club",
+      fill: d => clubColor(d.club),
       r: 4
     }),
     showLabels ? Plot.text(braid.filter(d => d.mw === maxMw), {
@@ -255,30 +289,49 @@ Plot.plot({
 return {braid};
 }});
 
-define({id: "6edf2c4e", inputs: ["Plot","n","sd","latest","showLabels","short","maxMw","d3","width","labelMr","display"], body: async (Plot,n,sd,latest,showLabels,short,maxMw,d3,width,labelMr,display) => {
-display(await(
+define({id: "30448934", inputs: ["sd","d3","maxMw","Plot","n","clubColor","showLabels","short","width","labelMr"], outputs: ["expBraid","expLatest"], body: (sd,d3,maxMw,Plot,n,clubColor,showLabels,short,width,labelMr) => {
+const expBraid = (() => {
+  const rows = sd.map(d => ({...d, lane: Math.round(d.exp_pos)}));
+  const byMw = d3.group(rows, d => d.mw);
+  const out = [];
+  for (const [mw, group] of byMw) {
+    const byLane = d3.group(group, d => d.lane);
+    for (const [lane, tied] of byLane) {
+      tied.sort((a, b) => a.exp_pos - b.exp_pos);
+      const m = tied.length;
+      const pitch = Math.min(0.4, 0.8 / m);
+      tied.forEach((d, i) => {
+        out.push({...d, yPos: lane + (i - (m - 1) / 2) * pitch});
+      });
+    }
+  }
+  return out;
+})();
+
+const expLatest = expBraid.filter(d => d.mw === maxMw);
+
 Plot.plot({
   marks: [
     Plot.ruleY([4.5], {stroke: "#4a90d9", strokeOpacity: 0.2}),
     Plot.ruleY([n - 3 + 0.5], {stroke: "#d94a4a", strokeOpacity: 0.2}),
-    Plot.line(sd, {
+    Plot.line(expBraid, {
       x: "mw",
-      y: "exp_pos",
-      stroke: "club",
+      y: "yPos",
+      stroke: d => clubColor(d.club),
       curve: "bump-x",
       strokeWidth: 2.5,
       strokeOpacity: 0.7,
       title: d => `${d.club}\nMW ${d.mw}: expected pos ${d.exp_pos.toFixed(1)}, xPts ${d.exp_pts.toFixed(1)}`
     }),
-    Plot.dot(latest, {
+    Plot.dot(expLatest, {
       x: "mw",
-      y: "exp_pos",
-      fill: "club",
+      y: "yPos",
+      fill: d => clubColor(d.club),
       r: 4
     }),
-    showLabels ? Plot.text(latest, {
+    showLabels ? Plot.text(expLatest, {
       x: "mw",
-      y: "exp_pos",
+      y: "yPos",
       text: d => short(d.club),
       dx: 10,
       textAnchor: "start",
@@ -297,17 +350,17 @@ Plot.plot({
   height: Math.max(500, n * 28),
   marginRight: labelMr
 })
-))
+return {expBraid,expLatest};
 }});
 
-define({id: "a4954059", inputs: ["Plot","sd","latest","showLabels","short","maxMw","width","n","labelMr","display"], body: async (Plot,sd,latest,showLabels,short,maxMw,width,n,labelMr,display) => {
+define({id: "fa55c5f9", inputs: ["Plot","sd","clubColor","latest","showLabels","short","maxMw","width","n","labelMr","display"], body: async (Plot,sd,clubColor,latest,showLabels,short,maxMw,width,n,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
     Plot.line(sd, {
       x: "mw",
       y: "exp_pts",
-      stroke: "club",
+      stroke: d => clubColor(d.club),
       strokeWidth: 2.5,
       strokeOpacity: 0.7,
       title: d => `${d.club}\nMW ${d.mw}: xPts ${d.exp_pts.toFixed(1)}`
@@ -315,7 +368,7 @@ Plot.plot({
     Plot.dot(latest, {
       x: "mw",
       y: "exp_pts",
-      fill: "club",
+      fill: d => clubColor(d.club),
       r: 4
     }),
     showLabels ? Plot.text(latest, {
@@ -337,7 +390,7 @@ Plot.plot({
 ))
 }});
 
-define({id: "01da39fa", inputs: ["Plot","sd","titleSet","latest","showLabels","short","width","labelMr","display"], body: async (Plot,sd,titleSet,latest,showLabels,short,width,labelMr,display) => {
+define({id: "b0624026", inputs: ["Plot","sd","titleSet","clubColor","latest","showLabels","short","width","labelMr","display"], body: async (Plot,sd,titleSet,clubColor,latest,showLabels,short,width,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
@@ -351,14 +404,14 @@ Plot.plot({
     Plot.line(sd.filter(d => titleSet.has(d.club)), {
       x: "mw",
       y: "p_title",
-      stroke: "club",
+      stroke: d => clubColor(d.club),
       strokeWidth: 2.5,
       title: d => `${d.club}: ${(d.p_title * 100).toFixed(1)}%`
     }),
     Plot.dot(latest.filter(d => titleSet.has(d.club)), {
       x: "mw",
       y: "p_title",
-      fill: "club",
+      fill: d => clubColor(d.club),
       r: 4
     }),
     showLabels ? Plot.text(latest.filter(d => titleSet.has(d.club)), {
@@ -380,7 +433,7 @@ Plot.plot({
 ))
 }});
 
-define({id: "61488019", inputs: ["Plot","sd","relegSet","latest","showLabels","short","width","labelMr","display"], body: async (Plot,sd,relegSet,latest,showLabels,short,width,labelMr,display) => {
+define({id: "94f8e40e", inputs: ["Plot","sd","relegSet","clubColor","latest","showLabels","short","width","labelMr","display"], body: async (Plot,sd,relegSet,clubColor,latest,showLabels,short,width,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
@@ -394,14 +447,14 @@ Plot.plot({
     Plot.line(sd.filter(d => relegSet.has(d.club)), {
       x: "mw",
       y: "p_releg",
-      stroke: "club",
+      stroke: d => clubColor(d.club),
       strokeWidth: 2.5,
       title: d => `${d.club}: ${(d.p_releg * 100).toFixed(1)}%`
     }),
     Plot.dot(latest.filter(d => relegSet.has(d.club)), {
       x: "mw",
       y: "p_releg",
-      fill: "club",
+      fill: d => clubColor(d.club),
       r: 4
     }),
     showLabels ? Plot.text(latest.filter(d => relegSet.has(d.club)), {
@@ -490,7 +543,7 @@ Plot.plot({
 </style>
 <div class="observablehq observablehq--block"><!--:9cb0d82a:--></div>
 <div class="observablehq observablehq--block"><!--:40d131f0:--></div>
-<div class="observablehq observablehq--block"><!--:c09204d9:--></div>
+<div class="observablehq observablehq--block"><!--:5e18fc37:--></div>
 <h1 id="" tabindex="-1"><a class="observablehq-header-anchor" href="#"><observablehq-loading></observablehq-loading><!--:8f8e24f6:--></a></h1>
 <p><small>Matchweek <observablehq-loading></observablehq-loading><!--:22beed87:--> · <observablehq-loading></observablehq-loading><!--:1b16b1df:--> clubs · Dixon-Coles model · 10,000 simulations</small></p>
 <hr>
@@ -498,19 +551,19 @@ Plot.plot({
 <div class="observablehq observablehq--block"><!--:1201e1fe:--></div>
 <hr>
 <h2 id="position-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#position-trajectory">Position Trajectory</a></h2>
-<div class="observablehq observablehq--block"><!--:8eed031f:--></div>
+<div class="observablehq observablehq--block"><!--:afb12b0c:--></div>
 <h2 id="expected-positions" tabindex="-1"><a class="observablehq-header-anchor" href="#expected-positions">Expected Positions</a></h2>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:6edf2c4e:--></div>
+<div class="observablehq observablehq--block"><!--:30448934:--></div>
 <h2 id="points-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#points-trajectory">Points Trajectory</a></h2>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:a4954059:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:fa55c5f9:--></div>
 <h2 id="title-race" tabindex="-1"><a class="observablehq-header-anchor" href="#title-race">Title Race</a></h2>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:01da39fa:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:b0624026:--></div>
 <h2 id="relegation-battle" tabindex="-1"><a class="observablehq-header-anchor" href="#relegation-battle">Relegation Battle</a></h2>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:61488019:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:94f8e40e:--></div>
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="next" href="./positions"><span>Position Grid</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-24T23:50:55">Aug 24, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-24T23:59:24">Aug 24, 2026</a>.</div>
 </footer>
 </div>
 </body>
