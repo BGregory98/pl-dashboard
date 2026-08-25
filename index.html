@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="generator" content="Observable Framework v1.13.4">
+<title>Season Tracker | English Football</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
+<link rel="preload" as="style" href="./_observablehq/theme-air,near-midnight.b050d634.css">
+<link rel="preload" as="style" href="./_observablehq/stdlib/inputs.f7bf0e12.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
+<link rel="stylesheet" type="text/css" href="./_observablehq/theme-air,near-midnight.b050d634.css">
+<link rel="stylesheet" type="text/css" href="./_observablehq/stdlib/inputs.f7bf0e12.css">
+<link rel="modulepreload" href="./_observablehq/client.c543f8ba.js">
+<link rel="modulepreload" href="./_observablehq/runtime.607a8173.js">
+<link rel="modulepreload" href="./_observablehq/stdlib.81cd90e3.js">
+<link rel="modulepreload" href="./_npm/d3@7.9.0/080cf928.js">
+<link rel="modulepreload" href="./_observablehq/stdlib/inputs.8ddbf299.js">
+<link rel="modulepreload" href="./_npm/@observablehq/plot@0.6.17/93ce672e.js">
+<link rel="modulepreload" href="./_npm/d3-dsv@3.0.1/097745a2.js">
+<link rel="modulepreload" href="./_npm/htl@1.0.0/11521f02.js">
+<link rel="modulepreload" href="./_npm/isoformat@0.2.1/604cb63b.js">
+<link rel="modulepreload" href="./_npm/d3-array@3.2.4/b8e751b6.js">
+<link rel="modulepreload" href="./_npm/d3-axis@3.0.0/c662ea05.js">
+<link rel="modulepreload" href="./_npm/d3-brush@3.0.0/d162d8c6.js">
+<link rel="modulepreload" href="./_npm/d3-chord@3.0.1/5cedd0be.js">
+<link rel="modulepreload" href="./_npm/d3-color@3.1.0/65d51007.js">
+<link rel="modulepreload" href="./_npm/d3-contour@4.0.2/c576a91a.js">
+<link rel="modulepreload" href="./_npm/d3-delaunay@6.0.4/8b43826d.js">
+<link rel="modulepreload" href="./_npm/d3-dispatch@3.0.1/3fb06f14.js">
+<link rel="modulepreload" href="./_npm/d3-drag@3.0.0/20b76948.js">
+<link rel="modulepreload" href="./_npm/d3-ease@3.0.1/8683b012.js">
+<link rel="modulepreload" href="./_npm/d3-fetch@3.0.1/5c319046.js">
+<link rel="modulepreload" href="./_npm/d3-force@3.0.0/33924f3e.js">
+<link rel="modulepreload" href="./_npm/d3-format@3.1.2/8d67a1ae.js">
+<link rel="modulepreload" href="./_npm/d3-geo@3.1.1/8037bd0b.js">
+<link rel="modulepreload" href="./_npm/d3-hierarchy@3.1.2/a9ba0229.js">
+<link rel="modulepreload" href="./_npm/d3-interpolate@3.0.1/e0a47f97.js">
+<link rel="modulepreload" href="./_npm/d3-path@3.1.0/f9e9e0ab.js">
+<link rel="modulepreload" href="./_npm/d3-polygon@3.0.1/2da8eb3b.js">
+<link rel="modulepreload" href="./_npm/d3-quadtree@3.0.1/09002e01.js">
+<link rel="modulepreload" href="./_npm/d3-random@3.0.1/5108797c.js">
+<link rel="modulepreload" href="./_npm/d3-scale@4.0.2/c9f2571b.js">
+<link rel="modulepreload" href="./_npm/d3-scale-chromatic@3.1.0/f3c78e0d.js">
+<link rel="modulepreload" href="./_npm/d3-selection@3.0.0/28717d05.js">
+<link rel="modulepreload" href="./_npm/d3-shape@3.2.0/7c6e2a50.js">
+<link rel="modulepreload" href="./_npm/d3-time@3.1.0/3d1d57c6.js">
+<link rel="modulepreload" href="./_npm/d3-time-format@4.1.0/643581a8.js">
+<link rel="modulepreload" href="./_npm/d3-timer@3.0.1/e99232db.js">
+<link rel="modulepreload" href="./_npm/d3-transition@3.0.1/bd07fd9a.js">
+<link rel="modulepreload" href="./_npm/d3-zoom@3.0.0/d09f7cc9.js">
+<link rel="modulepreload" href="./_npm/interval-tree-1d@1.0.4/f53f17b2.js">
+<link rel="modulepreload" href="./_npm/internmap@2.0.3/af036d7e.js">
+<link rel="modulepreload" href="./_npm/delaunator@5.1.0/7b06abe7.js">
+<link rel="modulepreload" href="./_npm/binary-search-bounds@2.0.5/5f640032.js">
+<link rel="modulepreload" href="./_npm/robust-predicates@3.0.3/b42f30a7.js">
+<style>
+    /* Default table vars (light) */
+    :root {
+      --tbl-border: #eee;
+      --tbl-hover: #f8f8f6;
+      --tbl-top4: #f0f4fa;
+      --tbl-top4h: #e4ecf6;
+      --tbl-releg: #fdf2f0;
+      --tbl-relegh: #f8e8e4;
+    }
+
+    /* System dark (no toggle set) — table vars only; framework handles its own */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --tbl-border: #2e2e2b;
+        --tbl-hover: #24241f;
+        --tbl-top4: #1a2030;
+        --tbl-top4h: #1e2840;
+        --tbl-releg: #2e1c18;
+        --tbl-relegh: #3a2420;
+      }
+    }
+
+    /* Toggle: force light — override ALL framework vars so sidebar etc respond */
+    :root[data-theme="light"] {
+      --theme-foreground: #1b1e23;
+      --theme-foreground-focus: #3b5fc0;
+      --theme-background-a: #ffffff;
+      --theme-background-b: color-mix(in srgb, var(--theme-foreground) 4%, var(--theme-background-a));
+      --theme-background: var(--theme-background-a);
+      --theme-background-alt: var(--theme-background-b);
+      --theme-foreground-alt: color-mix(in srgb, var(--theme-foreground) 90%, var(--theme-background-a));
+      --theme-foreground-muted: color-mix(in srgb, var(--theme-foreground) 60%, var(--theme-background-a));
+      --theme-foreground-faint: color-mix(in srgb, var(--theme-foreground) 50%, var(--theme-background-a));
+      --theme-foreground-fainter: color-mix(in srgb, var(--theme-foreground) 30%, var(--theme-background-a));
+      --theme-foreground-faintest: color-mix(in srgb, var(--theme-foreground) 14%, var(--theme-background-a));
+      color-scheme: light;
+      --syntax-keyword: #d73a49;
+      --syntax-entity: #6f42c1;
+      --syntax-constant: #005cc5;
+      --syntax-string: #032f62;
+      --syntax-variable: #e36209;
+      --syntax-comment: var(--theme-foreground-muted);
+      --syntax-entity-tag: #22863a;
+      --syntax-storage-modifier-import: #24292e;
+      --tbl-border: #eee;
+      --tbl-hover: #f8f8f6;
+      --tbl-top4: #f0f4fa;
+      --tbl-top4h: #e4ecf6;
+      --tbl-releg: #fdf2f0;
+      --tbl-relegh: #f8e8e4;
+    }
+
+    /* Toggle: force dark — override ALL framework vars so sidebar etc respond */
+    :root[data-theme="dark"] {
+      --theme-foreground: #dfdfd6;
+      --theme-foreground-focus: oklch(.712564 .257662 265.758);
+      --theme-background-b: #161616;
+      --theme-background-a: color-mix(in srgb, var(--theme-foreground) 4%, var(--theme-background-b));
+      --theme-background: var(--theme-background-a);
+      --theme-background-alt: var(--theme-background-b);
+      --theme-foreground-alt: color-mix(in srgb, var(--theme-foreground) 90%, var(--theme-background-b));
+      --theme-foreground-muted: color-mix(in srgb, var(--theme-foreground) 60%, var(--theme-background-b));
+      --theme-foreground-faint: color-mix(in srgb, var(--theme-foreground) 50%, var(--theme-background-b));
+      --theme-foreground-fainter: color-mix(in srgb, var(--theme-foreground) 30%, var(--theme-background-b));
+      --theme-foreground-faintest: color-mix(in srgb, var(--theme-foreground) 14%, var(--theme-background-b));
+      color-scheme: dark;
+      --syntax-keyword: #ff7b72;
+      --syntax-entity: #d2a8ff;
+      --syntax-constant: #79c0ff;
+      --syntax-string: #a5d6ff;
+      --syntax-variable: #ffa657;
+      --syntax-comment: var(--theme-foreground-muted);
+      --syntax-entity-tag: #7ee787;
+      --syntax-storage-modifier-import: #c9d1d9;
+      --tbl-border: #2e2e2b;
+      --tbl-hover: #24241f;
+      --tbl-top4: #1a2030;
+      --tbl-top4h: #1e2840;
+      --tbl-releg: #2e1c18;
+      --tbl-relegh: #3a2420;
+    }
+  </style>
+<script type="module">
+
+import {define} from "./_observablehq/client.c543f8ba.js";
+import {registerFile} from "./_observablehq/stdlib.81cd90e3.js";
+
+registerFile("./data/fixtures.csv", {"name":"./data/fixtures.csv","mimeType":"text/csv","path":"./_file/data/fixtures.8aee8aa2.csv","lastModified":1787677802598,"size":804});
+registerFile("./data/seasons.json", {"name":"./data/seasons.json","mimeType":"application/json","path":"./_file/data/seasons.3375a9bd.json","lastModified":1787625417771,"size":351});
+registerFile("./data/summary.csv", {"name":"./data/summary.csv","mimeType":"text/csv","path":"./_file/data/summary.33c36dda.csv","lastModified":1787626196615,"size":4576305});
+
+define({id: "f3935fbc", outputs: ["themeBtn","root","getTheme","updateIcon"], body: () => {
+const themeBtn = document.createElement("button");
+themeBtn.className = "theme-btn";
+const root = document.documentElement;
+function getTheme() {
+  return root.getAttribute("data-theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+}
+function updateIcon() { themeBtn.textContent = getTheme() === "dark" ? "☀️" : "🌙"; }
+themeBtn.onclick = () => {
+  const next = getTheme() === "dark" ? "light" : "dark";
+  root.setAttribute("data-theme", next);
+  updateIcon();
+};
+updateIcon();
+document.body.appendChild(themeBtn);
+return {themeBtn,root,getTheme,updateIcon};
+}});
+
+define({id: "45d04559", inputs: ["FileAttachment"], outputs: ["seasons","summary","fixtures"], body: (FileAttachment) => {
+const seasons = FileAttachment("./data/seasons.json").json();
+const summary = FileAttachment("./data/summary.csv").csv({typed: true});
+const fixtures = FileAttachment("./data/fixtures.csv").csv({typed: true});
+return {seasons,summary,fixtures};
+}});
+
+define({id: "40d131f0", inputs: ["view","Inputs","seasons"], outputs: ["season"], body: (view,Inputs,seasons) => {
+const season = view(Inputs.select(seasons.toReversed(), {
+  value: seasons.at(-1),
+  label: "Season"
+}));
+return {season};
+}});
+
+define({id: "b1938df0", inputs: ["season","summary","d3","width","dark"], outputs: ["endYear","sd","mws","maxMw","prevMw","latest","prev","prevMap","n","SHORT","short","CLUB_COLORS","clubColor","labelMr","showLabels","grey","clubs","colorDomain","colorRange","xDomain","titleSet","relegSet","repel"], body: (season,summary,d3,width,dark) => {
+const endYear = parseInt(season.split("-")[0]) + 1;
+const sd = summary.filter(d => d.season_end_year === endYear);
+const mws = [...new Set(sd.map(d => d.mw))].sort((a, b) => a - b);
+const maxMw = d3.max(mws);
+const prevMw = mws.length > 1 ? mws[mws.length - 2] : null;
+
+const latest = sd.filter(d => d.mw === maxMw).sort((a, b) => a.exp_pos - b.exp_pos);
+const prev = prevMw !== null ? sd.filter(d => d.mw === prevMw) : [];
+const prevMap = new Map(prev.map(d => [d.club, d]));
+const n = latest.length;
+
+const SHORT = new Map([
+  ["AFC Bournemouth", "Bournemouth"],
+  ["Brighton & Hove Albion", "Brighton"],
+  ["Manchester City", "Man City"],
+  ["Manchester United", "Man Utd"],
+  ["Newcastle United", "Newcastle"],
+  ["Nottingham Forest", "Forest"],
+  ["Tottenham Hotspur", "Spurs"],
+  ["Sheffield Wednesday", "Sheff Wed"],
+  ["Sheffield United", "Sheff Utd"],
+  ["West Bromwich Albion", "West Brom"],
+  ["West Ham United", "West Ham"],
+  ["Wolverhampton Wanderers", "Wolves"],
+  ["Queens Park Rangers", "QPR"],
+  ["Bolton Wanderers", "Bolton"],
+  ["Blackburn Rovers", "Blackburn"],
+  ["Huddersfield Town", "Huddersfield"],
+  ["Leicester City", "Leicester"],
+  ["Coventry City", "Coventry"],
+  ["Hull City", "Hull"],
+  ["Ipswich Town", "Ipswich"],
+  ["Leeds United", "Leeds"],
+  ["Stoke City", "Stoke"],
+  ["Swansea City", "Swansea"],
+  ["Cardiff City", "Cardiff"],
+  ["Norwich City", "Norwich"],
+  ["Derby County", "Derby"],
+  ["Middlesbrough", "Boro"],
+]);
+const short = name => SHORT.get(name) ?? name;
+
+const CLUB_COLORS = new Map([
+  ["Arsenal", "#D6432B"], ["Aston Villa", "#591C33"],
+  ["Barnsley", "#7A2D29"], ["Birmingham City", "#4627CE"],
+  ["Blackburn Rovers", "#549BCC"], ["Blackpool", "#E68F44"],
+  ["Bolton Wanderers", "#1E2644"], ["AFC Bournemouth", "#A33022"],
+  ["Bradford City", "#866E2B"], ["Brentford", "#DB6B45"],
+  ["Brighton & Hove Albion", "#3354A1"], ["Burnley", "#632C47"],
+  ["Cardiff City", "#3E73A5"], ["Charlton Athletic", "#8F322E"],
+  ["Chelsea", "#24407B"], ["Coventry City", "#557BA2"],
+  ["Crystal Palace", "#4C67AE"], ["Derby County", "#494949"],
+  ["Everton", "#2B3580"], ["Fulham", "#1B1B1B"],
+  ["Huddersfield Town", "#325F91"], ["Hull City", "#B97B3D"],
+  ["Ipswich Town", "#516590"], ["Leeds United", "#7B7B7B"],
+  ["Leicester City", "#2A60A0"], ["Liverpool", "#B23A3C"],
+  ["Luton Town", "#D18241"], ["Manchester City", "#80A9CE"],
+  ["Manchester United", "#C44834"], ["Middlesbrough", "#9F3A2D"],
+  ["Newcastle United", "#67AFD2"], ["Norwich City", "#48A161"],
+  ["Nottingham Forest", "#B25040"], ["Oldham Athletic", "#4981C3"],
+  ["Portsmouth", "#231B6F"], ["Queens Park Rangers", "#4D4B85"],
+  ["Reading", "#4E70AC"], ["Sheffield United", "#DE7B76"],
+  ["Sheffield Wednesday", "#6075C5"], ["Southampton", "#D46659"],
+  ["Stoke City", "#C8514A"], ["Sunderland", "#D25C5F"],
+  ["Swansea City", "#5C5C5C"], ["Swindon Town", "#632622"],
+  ["Tottenham Hotspur", "#1E234B"], ["Watford", "#C3A24E"],
+  ["West Bromwich Albion", "#344F83"], ["West Ham United", "#6E313D"],
+  ["Wigan Athletic", "#3D5495"], ["Wimbledon", "#6C7FBE"],
+  ["Wolverhampton Wanderers", "#C09244"]
+]);
+const clubColor = name => CLUB_COLORS.get(name) ?? "#999";
+
+const labelMr = width < 500 ? 0 : 100;
+const showLabels = width >= 500;
+const grey = dark ? "#444" : "#ccc";
+
+const clubs = [...new Set(sd.map(d => d.club))].sort();
+const colorDomain = clubs;
+const colorRange = clubs.map(clubColor);
+
+const xDomain = [0, Math.max(maxMw + 4, 38)];
+
+const titleSet = new Set(latest.filter(d => d.p_title > 0.05).map(d => d.club));
+const relegSet = new Set(latest.filter(d => d.p_releg > 0.05).map(d => d.club));
+
+function repel(data, yKey, gap) {
+  const arr = data.map(d => ({...d, _ly: d[yKey]}));
+  arr.sort((a, b) => a._ly - b._ly);
+  if (arr.length < 2) return arr;
+  for (let iter = 0; iter < 20; iter++) {
+    let moved = false;
+    for (let i = 1; i < arr.length; i++) {
+      const overlap = gap - (arr[i]._ly - arr[i - 1]._ly);
+      if (overlap > 0) {
+        arr[i - 1]._ly -= overlap / 2;
+        arr[i]._ly += overlap / 2;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return arr;
+}
+return {endYear,sd,mws,maxMw,prevMw,latest,prev,prevMap,n,SHORT,short,CLUB_COLORS,clubColor,labelMr,showLabels,grey,clubs,colorDomain,colorRange,xDomain,titleSet,relegSet,repel};
+}});
+
+define({id: "8f8e24f6", mode: "inline", inputs: ["season","display"], body: async (season,display) => {
+display(await(
+season
+))
+}});
+
+define({id: "22beed87", mode: "inline", inputs: ["maxMw","display"], body: async (maxMw,display) => {
+display(await(
+maxMw
+))
+}});
+
+define({id: "1b16b1df", mode: "inline", inputs: ["n","display"], body: async (n,display) => {
+display(await(
+n
+))
+}});
+
+define({id: "32e94101", inputs: ["prevMap","latest","n","short","display"], outputs: ["fmtPct","chg","chgPts","chgVal","rowCls","tableRows","wrapper"], body: (prevMap,latest,n,short,display) => {
+function fmtPct(v) {
+  if (v < 0.001) return '<span class="dim">—</span>';
+  if (v >= 0.995) return "99+";
+  return (v * 100).toFixed(1);
+}
+
+function chg(cur, club, field, invert) {
+  const p = prevMap.get(club);
+  if (!p) return "";
+  const d = cur - p[field];
+  const pp = d * 100;
+  if (Math.abs(pp) < 0.05) return "";
+  const sign = pp > 0 ? "+" : "";
+  const cls = invert ? (d > 0 ? "dn" : "up") : (d > 0 ? "up" : "dn");
+  return `<span class="chg ${cls}">${sign}${pp.toFixed(1)}</span>`;
+}
+
+function chgPts(cur, club) {
+  const p = prevMap.get(club);
+  if (!p) return "";
+  const d = cur - p.exp_pts;
+  if (Math.abs(d) < 0.05) return "";
+  const sign = d > 0 ? "+" : "";
+  const cls = d > 0 ? "up" : "dn";
+  return `<span class="chg ${cls}">${sign}${d.toFixed(1)}</span>`;
+}
+
+function chgVal(cur, club, field) {
+  const p = prevMap.get(club);
+  if (!p) return "";
+  const d = cur - p[field];
+  if (Math.abs(d) < 0.5) return "";
+  const sign = d > 0 ? "+" : "";
+  const cls = d > 0 ? "up" : "dn";
+  return `<span class="chg ${cls}">${sign}${Math.round(d)}</span>`;
+}
+
+function rowCls(rank, n) {
+  if (rank <= 4) return "hi-top4";
+  if (rank > n - 3) return "hi-releg";
+  return "";
+}
+
+const tableRows = latest.map((d, i) => `<tr class="${rowCls(i + 1, n)}">
+  <td>${i + 1}</td>
+  <td>${short(d.club)}</td>
+  <td>${d.played}</td>
+  <td><span class="val">${d.pts_now}</span> ${chgVal(d.pts_now, d.club, "pts_now")}</td>
+  <td><span class="val">${d.exp_pts.toFixed(1)}</span> ${chgPts(d.exp_pts, d.club)}</td>
+  <td>${fmtPct(d.p_title)} ${chg(d.p_title, d.club, "p_title", false)}</td>
+  <td>${fmtPct(d.p_top4)} ${chg(d.p_top4, d.club, "p_top4", false)}</td>
+  <td>${fmtPct(d.p_releg)} ${chg(d.p_releg, d.club, "p_releg", true)}</td>
+</tr>`).join("\n");
+
+const wrapper = document.createElement("div");
+wrapper.style.overflowX = "auto";
+wrapper.innerHTML = `<table class="pred-table">
+<thead><tr><th>#</th><th>Club</th><th>Pld</th><th>Pts</th><th>xPts</th><th>Title</th><th>Top 4</th><th>Releg</th></tr></thead>
+<tbody>${tableRows}</tbody>
+</table>`;
+display(wrapper);
+return {fmtPct,chg,chgPts,chgVal,rowCls,tableRows,wrapper};
+}});
+
+define({id: "bbfadadd", mode: "inline", inputs: ["fixtures","display"], body: async (fixtures,display) => {
+display(await(
+fixtures[0]?.matchweek ?? "?"
+))
+}});
+
+define({id: "7d0d495c", inputs: ["d3","fixtures","short","display"], body: (d3,fixtures,short,display) => {
+{
+  const byDate = d3.group(fixtures, d => d.date);
+  const fmt = d => {
+    const dt = new Date(d + "T12:00:00");
+    return dt.toLocaleDateString("en-GB", {weekday: "short", day: "numeric", month: "short"});
+  };
+
+  let rows = "";
+  for (const [date, matches] of byDate) {
+    rows += `<tr><td class="fix-date" colspan="3">${fmt(date)}</td></tr>`;
+    for (const m of matches) {
+      const ph = (m.p_home * 100).toFixed(0);
+      const pd = (m.p_draw * 100).toFixed(0);
+      const pa = (m.p_away * 100).toFixed(0);
+      rows += `<tr>
+        <td class="home-cell">${short(m.home)}</td>
+        <td style="text-align:center">
+          <div class="fix-prob-bar">
+            <span class="ph" style="width:${ph}%">${ph}%</span>
+            <span class="pd" style="width:${pd}%">${pd}%</span>
+            <span class="pa" style="width:${pa}%">${pa}%</span>
+          </div>
+        </td>
+        <td class="away-cell">${short(m.away)}</td>
+      </tr>`;
+    }
+  }
+
+  const wrapper = document.createElement("div");
+  wrapper.style.overflowX = "auto";
+  wrapper.innerHTML = `<table class="fix-table">
+    <thead><tr><th>Home</th><th>H / D / A</th><th>Away</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+  display(wrapper);
+}
+}});
+
+define({id: "282a376d", inputs: ["sd"], outputs: ["braid"], body: (sd) => {
+const braid = sd.filter(d => d.mw > 0).map(d => ({...d, pos: d.pos_now}));
+return {braid};
+}});
+
+define({id: "a387d2f4", inputs: ["Plot","n","braid","maxMw","showLabels","short","xDomain","d3","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,n,braid,maxMw,showLabels,short,xDomain,d3,colorDomain,colorRange,width,labelMr,display) => {
+display(await(
+Plot.plot({
+  marks: [
+    Plot.ruleY([4.5], {stroke: "#4a90d9", strokeOpacity: 0.2}),
+    Plot.ruleY([n - 3 + 0.5], {stroke: "#d94a4a", strokeOpacity: 0.2}),
+    Plot.line(braid, {
+      x: "mw",
+      y: "pos",
+      stroke: "club",
+      curve: "bump-x",
+      strokeWidth: 2.5,
+      strokeOpacity: 0.7
+    }),
+    Plot.dot(braid.filter(d => d.mw === maxMw), {
+      x: "mw",
+      y: "pos",
+      fill: "club",
+      r: 4
+    }),
+    showLabels ? Plot.text(braid.filter(d => d.mw === maxMw), {
+      x: "mw",
+      y: "pos",
+      text: d => short(d.club),
+      dx: 10,
+      textAnchor: "start",
+      fontSize: 11
+    }) : null,
+    Plot.tip(braid, Plot.pointer({
+      x: "mw",
+      y: "pos",
+      stroke: "club",
+      channels: {
+        "Club": {value: d => short(d.club)},
+        "Pos": {value: d => d.pos},
+        "Pts": {value: d => d.pts_now},
+        "GD": {value: d => `${d.gd_now >= 0 ? "+" : ""}${d.gd_now}`},
+        "Played": {value: d => d.played}
+      },
+      format: {stroke: false, x: false, y: false}
+    }))
+  ].filter(Boolean),
+  x: {label: "Matchweek", domain: xDomain},
+  y: {
+    reverse: true,
+    label: "Position",
+    domain: [0.5, n + 0.5],
+    ticks: d3.range(1, n + 1)
+  },
+  color: {domain: colorDomain, range: colorRange, legend: false},
+  width,
+  height: Math.max(500, n * 28),
+  marginRight: labelMr
+})
+))
+}});
+
+define({id: "ac3fd42e", inputs: ["d3","sd","maxMw"], outputs: ["expBraid","expLatest"], body: (d3,sd,maxMw) => {
+const expBraid = (() => {
+  const byMw = d3.group(sd, d => d.mw);
+  const out = [];
+  for (const [mw, group] of byMw) {
+    const sorted = [...group].sort((a, b) => a.exp_pos - b.exp_pos);
+    sorted.forEach((d, i) => {
+      out.push({...d, yPos: i + 1});
+    });
+  }
+  return out;
+})();
+const expLatest = expBraid.filter(d => d.mw === maxMw);
+return {expBraid,expLatest};
+}});
+
+define({id: "a1695647", inputs: ["Plot","n","expBraid","expLatest","showLabels","short","xDomain","d3","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,n,expBraid,expLatest,showLabels,short,xDomain,d3,colorDomain,colorRange,width,labelMr,display) => {
+display(await(
+Plot.plot({
+  marks: [
+    Plot.ruleY([4.5], {stroke: "#4a90d9", strokeOpacity: 0.2}),
+    Plot.ruleY([n - 3 + 0.5], {stroke: "#d94a4a", strokeOpacity: 0.2}),
+    Plot.line(expBraid, {
+      x: "mw",
+      y: "yPos",
+      stroke: "club",
+      curve: "bump-x",
+      strokeWidth: 2.5,
+      strokeOpacity: 0.7
+    }),
+    Plot.dot(expLatest, {
+      x: "mw",
+      y: "yPos",
+      fill: "club",
+      r: 4
+    }),
+    showLabels ? Plot.text(expLatest, {
+      x: "mw",
+      y: "yPos",
+      text: d => short(d.club),
+      dx: 10,
+      textAnchor: "start",
+      fontSize: 11
+    }) : null,
+    Plot.tip(expBraid, Plot.pointer({
+      x: "mw",
+      y: "yPos",
+      stroke: "club",
+      channels: {
+        "Club": {value: d => short(d.club)},
+        "xPts": {value: d => d.exp_pts.toFixed(1)},
+        "Title": {value: d => `${(d.p_title * 100).toFixed(1)}%`},
+        "Releg": {value: d => `${(d.p_releg * 100).toFixed(1)}%`}
+      },
+      format: {stroke: false, x: false, y: false}
+    }))
+  ].filter(Boolean),
+  x: {label: "Matchweek", domain: xDomain},
+  y: {
+    reverse: true,
+    label: "Expected final position",
+    domain: [0.5, n + 0.5],
+    ticks: d3.range(1, n + 1)
+  },
+  color: {domain: colorDomain, range: colorRange, legend: false},
+  width,
+  height: Math.max(500, n * 28),
+  marginRight: labelMr
+})
+))
+}});
+
+define({id: "b12383de", inputs: ["repel","latest"], outputs: ["ptsLabels"], body: (repel,latest) => {
+const ptsLabels = repel(latest, "exp_pts", 1.5);
+return {ptsLabels};
+}});
+
+define({id: "35aeef07", inputs: ["Plot","sd","latest","showLabels","ptsLabels","short","xDomain","colorDomain","colorRange","width","n","labelMr","display"], body: async (Plot,sd,latest,showLabels,ptsLabels,short,xDomain,colorDomain,colorRange,width,n,labelMr,display) => {
+display(await(
+Plot.plot({
+  marks: [
+    Plot.line(sd, {
+      x: "mw",
+      y: "exp_pts",
+      stroke: "club",
+      strokeWidth: 2.5,
+      strokeOpacity: 0.7
+    }),
+    Plot.dot(latest, {
+      x: "mw",
+      y: "exp_pts",
+      fill: "club",
+      r: 4
+    }),
+    showLabels ? Plot.text(ptsLabels, {
+      x: "mw",
+      y: "_ly",
+      text: d => `${short(d.club)} ${d.exp_pts.toFixed(0)}`,
+      dx: 10,
+      textAnchor: "start",
+      fontSize: 11
+    }) : null,
+    Plot.tip(sd, Plot.pointer({
+      x: "mw",
+      y: "exp_pts",
+      stroke: "club",
+      channels: {
+        "Club": {value: d => short(d.club)},
+        "Actual Pts": {value: d => d.pts_now},
+        "90% range": {value: d => `${Math.round(d.pts_p05)}–${Math.round(d.pts_p95)}`},
+        "Played": {value: d => d.played}
+      },
+      format: {stroke: false, x: false, y: false}
+    }))
+  ].filter(Boolean),
+  x: {label: "Matchweek", domain: xDomain},
+  y: {label: "Projected final points"},
+  color: {domain: colorDomain, range: colorRange, legend: false},
+  width,
+  height: Math.max(800, n * 44),
+  marginRight: labelMr
+})
+))
+}});
+
+define({id: "cc55dbb1", inputs: ["repel","latest","titleSet"], outputs: ["titleLabels"], body: (repel,latest,titleSet) => {
+const titleLabels = repel(latest.filter(d => titleSet.has(d.club)), "p_title", 0.025);
+return {titleLabels};
+}});
+
+define({id: "6fd23091", inputs: ["Plot","sd","titleSet","grey","latest","showLabels","titleLabels","short","xDomain","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,sd,titleSet,grey,latest,showLabels,titleLabels,short,xDomain,colorDomain,colorRange,width,labelMr,display) => {
+display(await(
+Plot.plot({
+  marks: [
+    Plot.line(sd.filter(d => !titleSet.has(d.club)), {
+      x: "mw",
+      y: "p_title",
+      stroke: grey,
+      strokeWidth: 1,
+      z: "club"
+    }),
+    Plot.line(sd.filter(d => titleSet.has(d.club)), {
+      x: "mw",
+      y: "p_title",
+      stroke: "club",
+      strokeWidth: 2.5
+    }),
+    Plot.dot(latest.filter(d => titleSet.has(d.club)), {
+      x: "mw",
+      y: "p_title",
+      fill: "club",
+      r: 4
+    }),
+    showLabels ? Plot.text(titleLabels, {
+      x: "mw",
+      y: "_ly",
+      text: d => `${short(d.club)} ${(d.p_title * 100).toFixed(0)}%`,
+      dx: 10,
+      textAnchor: "start",
+      fontSize: 11
+    }) : null,
+    Plot.tip(sd.filter(d => titleSet.has(d.club)), Plot.pointer({
+      x: "mw",
+      y: "p_title",
+      stroke: "club",
+      channels: {
+        "Club": {value: d => short(d.club)},
+        "xPts": {value: d => d.exp_pts.toFixed(1)},
+        "Pos": {value: d => d.pos_now || "—"}
+      },
+      format: {stroke: false, x: false, y: false}
+    }))
+  ].filter(Boolean),
+  x: {label: "Matchweek", domain: xDomain},
+  y: {label: "Title probability", percent: true},
+  color: {domain: colorDomain, range: colorRange, legend: false},
+  width,
+  height: 350,
+  marginRight: labelMr
+})
+))
+}});
+
+define({id: "99663d0d", inputs: ["repel","latest","relegSet"], outputs: ["relegLabels"], body: (repel,latest,relegSet) => {
+const relegLabels = repel(latest.filter(d => relegSet.has(d.club)), "p_releg", 0.025);
+return {relegLabels};
+}});
+
+define({id: "57c34cd0", inputs: ["Plot","sd","relegSet","grey","latest","showLabels","relegLabels","short","xDomain","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,sd,relegSet,grey,latest,showLabels,relegLabels,short,xDomain,colorDomain,colorRange,width,labelMr,display) => {
+display(await(
+Plot.plot({
+  marks: [
+    Plot.line(sd.filter(d => !relegSet.has(d.club)), {
+      x: "mw",
+      y: "p_releg",
+      stroke: grey,
+      strokeWidth: 1,
+      z: "club"
+    }),
+    Plot.line(sd.filter(d => relegSet.has(d.club)), {
+      x: "mw",
+      y: "p_releg",
+      stroke: "club",
+      strokeWidth: 2.5
+    }),
+    Plot.dot(latest.filter(d => relegSet.has(d.club)), {
+      x: "mw",
+      y: "p_releg",
+      fill: "club",
+      r: 4
+    }),
+    showLabels ? Plot.text(relegLabels, {
+      x: "mw",
+      y: "_ly",
+      text: d => `${short(d.club)} ${(d.p_releg * 100).toFixed(0)}%`,
+      dx: 10,
+      textAnchor: "start",
+      fontSize: 11
+    }) : null,
+    Plot.tip(sd.filter(d => relegSet.has(d.club)), Plot.pointer({
+      x: "mw",
+      y: "p_releg",
+      stroke: "club",
+      channels: {
+        "Club": {value: d => short(d.club)},
+        "xPts": {value: d => d.exp_pts.toFixed(1)},
+        "Pts": {value: d => d.pts_now}
+      },
+      format: {stroke: false, x: false, y: false}
+    }))
+  ].filter(Boolean),
+  x: {label: "Matchweek", domain: xDomain},
+  y: {label: "Relegation probability", percent: true},
+  color: {domain: colorDomain, range: colorRange, legend: false},
+  width,
+  height: 350,
+  marginRight: labelMr
+})
+))
+}});
+
+</script>
+</head>
+<body>
+<input id="observablehq-sidebar-toggle" type="checkbox" title="Toggle sidebar">
+<label id="observablehq-sidebar-backdrop" for="observablehq-sidebar-toggle"></label>
+<nav id="observablehq-sidebar">
+  <ol>
+    <label id="observablehq-sidebar-close" for="observablehq-sidebar-toggle"></label>
+    <li class="observablehq-link observablehq-link-active"><a href="./">English Football</a></li>
+  </ol>
+  <ol>
+    <li class="observablehq-link observablehq-link-active"><a href="./">Season Tracker</a></li>
+    <li class="observablehq-link"><a href="./positions">Position Grid</a></li>
+  </ol>
+</nav>
+<script>{const e=document.querySelector("#observablehq-sidebar"),o=document.querySelector("#observablehq-sidebar-toggle"),r=sessionStorage.getItem("observablehq-sidebar");r?o.checked=r==="true":o.indeterminate=!0;for(const t of document.querySelectorAll("#observablehq-sidebar summary")){const s=t.parentElement;switch(sessionStorage.getItem(`observablehq-sidebar:${t.textContent}`)){case"true":s.open=!0;break;case"false":s.classList.contains("observablehq-section-active")||(s.open=!1);break}}addEventListener("beforeunload",()=>sessionStorage.setItem("observablehq-sidebar-scrolly",`${e.scrollTop}`));const a=sessionStorage.getItem("observablehq-sidebar-scrolly");a!=null&&(e.style.cssText="overflow: hidden;",e.scrollTop=+a,e.style.cssText="");}</script>
+<div id="observablehq-center">
+<main id="observablehq-main" class="observablehq">
+<style>
+  .theme-btn {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    z-index: 1000;
+    background: var(--theme-background, #fff);
+    border: 1px solid var(--tbl-border, #ccc);
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .pred-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+  .pred-table th {
+    position: sticky;
+    top: 0;
+    background: var(--theme-background, #fff);
+    border-bottom: 2px solid var(--theme-foreground, #2a2a26);
+    padding: 6px 8px;
+    text-align: right;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--theme-foreground-muted, #6b6b6b);
+    white-space: nowrap;
+  }
+  .pred-table th:nth-child(1), .pred-table th:nth-child(2) { text-align: left; }
+  .pred-table td {
+    padding: 7px 8px;
+    text-align: right;
+    border-bottom: 1px solid var(--tbl-border, #eee);
+    white-space: nowrap;
+  }
+  .pred-table td:nth-child(1) { text-align: center; color: var(--theme-foreground-muted, #6b6b6b); width: 30px; }
+  .pred-table td:nth-child(2) { text-align: left; font-weight: 500; }
+  .pred-table tr:hover td { background: var(--tbl-hover, #f8f8f6); }
+  .pred-table .val { font-weight: 500; }
+  .pred-table .chg { font-size: 11px; margin-left: 2px; }
+  .pred-table .up { color: #2a9d4e; }
+  .pred-table .dn { color: #d94a4a; }
+  .pred-table .dim { color: var(--theme-foreground-muted, #bbb); }
+  .pred-table .hi-top4 td { background: var(--tbl-top4, #f0f4fa); }
+  .pred-table .hi-releg td { background: var(--tbl-releg, #fdf2f0); }
+  .pred-table tr.hi-top4:hover td { background: var(--tbl-top4h, #e4ecf6); }
+  .pred-table tr.hi-releg:hover td { background: var(--tbl-relegh, #f8e8e4); }
+  @media (max-width: 600px) {
+    .pred-table { font-size: 13px; }
+    .pred-table th, .pred-table td { padding: 5px 4px; }
+    .pred-table .chg { display: block; margin-left: 0; }
+  }
+
+  .fix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+  .fix-table th {
+    background: var(--theme-background, #fff);
+    border-bottom: 2px solid var(--theme-foreground, #2a2a26);
+    padding: 6px 8px;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--theme-foreground-muted, #6b6b6b);
+    white-space: nowrap;
+  }
+  .fix-table th:nth-child(1) { text-align: left; }
+  .fix-table th:nth-child(2) { text-align: right; padding-right: 12px; }
+  .fix-table th:nth-child(3) { text-align: center; }
+  .fix-table th:nth-child(4) { text-align: left; padding-left: 12px; }
+  .fix-table td {
+    padding: 8px 8px;
+    border-bottom: 1px solid var(--tbl-border, #eee);
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  .fix-table tr:hover td { background: var(--tbl-hover, #f8f8f6); }
+  .fix-table .fix-date {
+    font-size: 12px;
+    color: var(--theme-foreground-muted, #6b6b6b);
+    padding: 5px 8px 2px;
+    border-bottom: none;
+  }
+  .fix-table .home-cell { text-align: right; font-weight: 500; padding-right: 12px; }
+  .fix-table .away-cell { text-align: left; font-weight: 500; padding-left: 12px; }
+  .fix-prob-bar {
+    display: flex;
+    width: 180px;
+    height: 22px;
+    border-radius: 3px;
+    overflow: hidden;
+    font-size: 11px;
+    font-weight: 600;
+    margin: 0 auto;
+  }
+  .fix-prob-bar span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    min-width: 0;
+  }
+  .fix-prob-bar .ph { background: #4a90d9; }
+  .fix-prob-bar .pd { background: #999; }
+  .fix-prob-bar .pa { background: #d94a4a; }
+  @media (max-width: 600px) {
+    .fix-table { font-size: 13px; }
+    .fix-prob-bar { width: 120px; height: 20px; font-size: 10px; }
+  }
+</style>
+<div class="observablehq observablehq--block"><!--:f3935fbc:--></div>
+<div class="observablehq observablehq--block"><!--:45d04559:--></div>
+<div class="observablehq observablehq--block"><!--:40d131f0:--></div>
+<div class="observablehq observablehq--block"><!--:b1938df0:--></div>
+<h1 id="" tabindex="-1"><a class="observablehq-header-anchor" href="#"><observablehq-loading></observablehq-loading><!--:8f8e24f6:--></a></h1>
+<p><small>Matchweek <observablehq-loading></observablehq-loading><!--:22beed87:--> · <observablehq-loading></observablehq-loading><!--:1b16b1df:--> clubs · Dixon-Coles model · 10,000 simulations</small></p>
+<hr>
+<h2 id="predictions" tabindex="-1"><a class="observablehq-header-anchor" href="#predictions">Predictions</a></h2>
+<div class="observablehq observablehq--block"><!--:32e94101:--></div>
+<hr>
+<h2 id="next-fixtures" tabindex="-1"><a class="observablehq-header-anchor" href="#next-fixtures">Next Fixtures</a></h2>
+<p><small>Matchweek <observablehq-loading></observablehq-loading><!--:bbfadadd:--> · Dixon-Coles match probabilities</small></p>
+<div class="observablehq observablehq--block"><!--:7d0d495c:--></div>
+<hr>
+<h2 id="position-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#position-trajectory">Position Trajectory</a></h2>
+<div class="observablehq observablehq--block"><!--:282a376d:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:a387d2f4:--></div>
+<h2 id="expected-positions" tabindex="-1"><a class="observablehq-header-anchor" href="#expected-positions">Expected Positions</a></h2>
+<div class="observablehq observablehq--block"><!--:ac3fd42e:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:a1695647:--></div>
+<h2 id="points-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#points-trajectory">Points Trajectory</a></h2>
+<div class="observablehq observablehq--block"><!--:b12383de:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:35aeef07:--></div>
+<h2 id="title-race" tabindex="-1"><a class="observablehq-header-anchor" href="#title-race">Title Race</a></h2>
+<div class="observablehq observablehq--block"><!--:cc55dbb1:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:6fd23091:--></div>
+<h2 id="relegation-battle" tabindex="-1"><a class="observablehq-header-anchor" href="#relegation-battle">Relegation Battle</a></h2>
+<div class="observablehq observablehq--block"><!--:99663d0d:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:57c34cd0:--></div>
+</main>
+<footer id="observablehq-footer">
+<nav><a rel="next" href="./positions"><span>Position Grid</span></a></nav>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T13:10:01">Aug 25, 2026</a>.</div>
+</footer>
+</div>
+</body>
+</html>
