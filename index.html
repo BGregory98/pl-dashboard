@@ -16,10 +16,10 @@
 <link rel="modulepreload" href="./_observablehq/runtime.607a8173.js">
 <link rel="modulepreload" href="./_observablehq/stdlib.81cd90e3.js">
 <link rel="modulepreload" href="./_npm/d3@7.9.0/080cf928.js">
+<link rel="modulepreload" href="./_npm/htl@1.0.0/11521f02.js">
 <link rel="modulepreload" href="./_observablehq/stdlib/inputs.8ddbf299.js">
 <link rel="modulepreload" href="./_npm/@observablehq/plot@0.6.17/93ce672e.js">
 <link rel="modulepreload" href="./_npm/d3-dsv@3.0.1/097745a2.js">
-<link rel="modulepreload" href="./_npm/htl@1.0.0/11521f02.js">
 <link rel="modulepreload" href="./_npm/isoformat@0.2.1/604cb63b.js">
 <link rel="modulepreload" href="./_npm/d3-array@3.2.4/b8e751b6.js">
 <link rel="modulepreload" href="./_npm/d3-axis@3.0.0/c662ea05.js">
@@ -84,12 +84,16 @@ const season = view(Inputs.select(seasons.toReversed(), {
 return {season};
 }});
 
-define({id: "33f4e381", inputs: ["season","summary","d3","width"], outputs: ["endYear","sd","mws","maxMw","latest","n","SHORT","short","labelMr","showLabels","titleSet","relegSet"], body: (season,summary,d3,width) => {
+define({id: "c09204d9", inputs: ["season","summary","d3","width"], outputs: ["endYear","sd","mws","maxMw","prevMw","latest","prev","prevMap","n","SHORT","short","labelMr","showLabels","titleSet","relegSet"], body: (season,summary,d3,width) => {
 const endYear = parseInt(season.split("-")[0]) + 1;
 const sd = summary.filter(d => d.season_end_year === endYear);
 const mws = [...new Set(sd.map(d => d.mw))].sort((a, b) => a - b);
 const maxMw = d3.max(mws);
-const latest = sd.filter(d => d.mw === maxMw).sort((a, b) => a.pos_now - b.pos_now);
+const prevMw = mws.length > 1 ? mws[mws.length - 2] : null;
+
+const latest = sd.filter(d => d.mw === maxMw).sort((a, b) => a.exp_pos - b.exp_pos);
+const prev = prevMw !== null ? sd.filter(d => d.mw === prevMw) : [];
+const prevMap = new Map(prev.map(d => [d.club, d]));
 const n = latest.length;
 
 const SHORT = new Map([
@@ -98,7 +102,7 @@ const SHORT = new Map([
   ["Manchester City", "Man City"],
   ["Manchester United", "Man Utd"],
   ["Newcastle United", "Newcastle"],
-  ["Nottingham Forest", "Nott'm Forest"],
+  ["Nottingham Forest", "Forest"],
   ["Tottenham Hotspur", "Spurs"],
   ["Sheffield Wednesday", "Sheff Wed"],
   ["Sheffield United", "Sheff Utd"],
@@ -128,7 +132,7 @@ const showLabels = width >= 500;
 
 const titleSet = new Set(sd.filter(d => d.p_title > 0.01).map(d => d.club));
 const relegSet = new Set(sd.filter(d => d.p_releg > 0.05).map(d => d.club));
-return {endYear,sd,mws,maxMw,latest,n,SHORT,short,labelMr,showLabels,titleSet,relegSet};
+return {endYear,sd,mws,maxMw,prevMw,latest,prev,prevMap,n,SHORT,short,labelMr,showLabels,titleSet,relegSet};
 }});
 
 define({id: "8f8e24f6", mode: "inline", inputs: ["season","display"], body: async (season,display) => {
@@ -149,32 +153,134 @@ n
 ))
 }});
 
-define({id: "92dddcea", inputs: ["Inputs","latest","short","display"], body: async (Inputs,latest,short,display) => {
-display(await(
-Inputs.table(
-  latest.map(d => ({
-    Pos: d.pos_now,
-    Club: short(d.club),
-    Pld: d.played,
-    Pts: d.pts_now,
-    GD: d.gd_now,
-    "Exp Pts": Math.round(d.exp_pts),
-    Title: d.p_title,
-    "Top 4": d.p_top4,
-    Releg: d.p_releg
-  })),
-  {
-    sort: "Pos",
-    format: {
-      GD: d => d > 0 ? `+${d}` : `${d}`,
-      Title: d => d < 0.001 ? "—" : `${(d * 100).toFixed(1)}%`,
-      "Top 4": d => d < 0.001 ? "—" : `${(d * 100).toFixed(1)}%`,
-      Releg: d => d < 0.001 ? "—" : `${(d * 100).toFixed(1)}%`
-    },
-    rows: 20
+define({id: "47c117e2", inputs: ["prevMap","latest"], outputs: ["delta","fmtPct","fmtDelta","deltaClass","relegDeltaClass","rows"], body: (prevMap,latest) => {
+function delta(cur, club, field) {
+  const p = prevMap.get(club);
+  if (!p) return null;
+  return cur - p[field];
+}
+
+function fmtPct(v) {
+  if (v < 0.001) return "—";
+  if (v >= 0.995) return "99+";
+  return (v * 100).toFixed(1);
+}
+
+function fmtDelta(d) {
+  if (d === null) return "";
+  const pp = d * 100;
+  if (Math.abs(pp) < 0.05) return "";
+  const sign = pp > 0 ? "+" : "";
+  return sign + pp.toFixed(1);
+}
+
+function deltaClass(d) {
+  if (d === null || Math.abs(d) < 0.0005) return "neutral";
+  return d > 0 ? "up" : "down";
+}
+
+function relegDeltaClass(d) {
+  if (d === null || Math.abs(d) < 0.0005) return "neutral";
+  return d > 0 ? "down" : "up";
+}
+
+const rows = latest.map((d, i) => {
+  const dTitle = delta(d.p_title, d.club, "p_title");
+  const dTop4  = delta(d.p_top4, d.club, "p_top4");
+  const dReleg = delta(d.p_releg, d.club, "p_releg");
+  const dXpts  = delta(d.exp_pts, d.club, "exp_pts");
+  return { ...d, rank: i + 1, dTitle, dTop4, dReleg, dXpts };
+});
+return {delta,fmtPct,fmtDelta,deltaClass,relegDeltaClass,rows};
+}});
+
+define({id: "c1ac818d", inputs: ["html"], outputs: ["tableStyle"], body: (html) => {
+const tableStyle = html`<style>
+  .pred-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
   }
-)
-))
+  .pred-table th {
+    position: sticky;
+    top: 0;
+    background: var(--theme-background, #fff);
+    border-bottom: 2px solid #2a2a26;
+    padding: 6px 8px;
+    text-align: right;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6b6b6b;
+    white-space: nowrap;
+  }
+  .pred-table th:nth-child(1), .pred-table th:nth-child(2) { text-align: left; }
+  .pred-table td {
+    padding: 7px 8px;
+    text-align: right;
+    border-bottom: 1px solid #eee;
+    white-space: nowrap;
+  }
+  .pred-table td:nth-child(1) { text-align: center; color: #6b6b6b; width: 30px; }
+  .pred-table td:nth-child(2) { text-align: left; font-weight: 500; }
+  .pred-table tr:hover td { background: #f8f8f6; }
+  .pred-table .val { font-weight: 500; }
+  .pred-table .chg { font-size: 11px; margin-left: 2px; }
+  .pred-table .chg.up { color: #2a9d4e; }
+  .pred-table .chg.down { color: #d94a4a; }
+  .pred-table .chg.neutral { color: #bbb; }
+  .pred-table .dim { color: #bbb; }
+  .pred-table .hi-title { background: #eef6ee; }
+  .pred-table .hi-top4 { background: #eef2f8; }
+  .pred-table .hi-releg { background: #fdf0ef; }
+  @media (max-width: 600px) {
+    .pred-table { font-size: 13px; }
+    .pred-table th, .pred-table td { padding: 5px 4px; }
+    .pred-table .chg { display: block; margin-left: 0; }
+  }
+</style>`;
+return {tableStyle};
+}});
+
+define({id: "33ab2159", inputs: ["html","tableStyle","rows","short","deltaClass","fmtPct","fmtDelta","relegDeltaClass"], outputs: ["rowClass","table"], body: (html,tableStyle,rows,short,deltaClass,fmtPct,fmtDelta,relegDeltaClass) => {
+function rowClass(d) {
+  if (d.p_title > 0.05) return "hi-title";
+  if (d.p_top4 > 0.3) return "hi-top4";
+  if (d.p_releg > 0.1) return "hi-releg";
+  return "";
+}
+
+const table = html`${tableStyle}
+<table class="pred-table">
+<thead><tr>
+  <th>#</th><th>Club</th><th>xPts</th><th>Title</th><th>Top 4</th><th>Releg</th>
+</tr></thead>
+<tbody>
+${rows.map(d => html`<tr class="${rowClass(d)}">
+  <td>${d.rank}</td>
+  <td>${short(d.club)}</td>
+  <td>
+    <span class="val">${d.exp_pts.toFixed(1)}</span>
+    <span class="chg ${deltaClass(d.dXpts)}">${d.dXpts !== null && Math.abs(d.dXpts) >= 0.05 ? (d.dXpts > 0 ? "+" : "") + d.dXpts.toFixed(1) : ""}</span>
+  </td>
+  <td>
+    <span class="val ${d.p_title < 0.001 ? "dim" : ""}">${fmtPct(d.p_title)}</span>
+    <span class="chg ${deltaClass(d.dTitle)}">${fmtDelta(d.dTitle)}</span>
+  </td>
+  <td>
+    <span class="val ${d.p_top4 < 0.001 ? "dim" : ""}">${fmtPct(d.p_top4)}</span>
+    <span class="chg ${deltaClass(d.dTop4)}">${fmtDelta(d.dTop4)}</span>
+  </td>
+  <td>
+    <span class="val ${d.p_releg < 0.001 ? "dim" : ""}">${fmtPct(d.p_releg)}</span>
+    <span class="chg ${relegDeltaClass(d.dReleg)}">${fmtDelta(d.dReleg)}</span>
+  </td>
+</tr>`)}
+</tbody>
+</table>`;
+return {rowClass,table};
 }});
 
 define({id: "8eed031f", inputs: ["sd","Plot","n","maxMw","showLabels","short","d3","width","labelMr"], outputs: ["braid"], body: (sd,Plot,n,maxMw,showLabels,short,d3,width,labelMr) => {
@@ -331,12 +437,17 @@ Plot.plot({
 <main id="observablehq-main" class="observablehq">
 <div class="observablehq observablehq--block"><!--:9cb0d82a:--></div>
 <div class="observablehq observablehq--block"><!--:40d131f0:--></div>
-<div class="observablehq observablehq--block"><!--:33f4e381:--></div>
+<div class="observablehq observablehq--block"><!--:c09204d9:--></div>
 <h1 id="" tabindex="-1"><a class="observablehq-header-anchor" href="#"><observablehq-loading></observablehq-loading><!--:8f8e24f6:--></a></h1>
 <p><small>Matchweek <observablehq-loading></observablehq-loading><!--:22beed87:--> · <observablehq-loading></observablehq-loading><!--:1b16b1df:--> clubs · Dixon-Coles model · 10,000 simulations</small></p>
 <hr>
-<h2 id="standings" tabindex="-1"><a class="observablehq-header-anchor" href="#standings">Standings</a></h2>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:92dddcea:--></div>
+<h2 id="predictions" tabindex="-1"><a class="observablehq-header-anchor" href="#predictions">Predictions</a></h2>
+<div class="observablehq observablehq--block"><!--:47c117e2:--></div>
+<div class="observablehq observablehq--block"><!--:c1ac818d:--></div>
+<div style="overflow-x: auto;">
+<div class="observablehq observablehq--block"><!--:33ab2159:--></div>
+</div>
+<hr>
 <h2 id="position-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#position-trajectory">Position Trajectory</a></h2>
 <div class="observablehq observablehq--block"><!--:8eed031f:--></div>
 <h2 id="title-race" tabindex="-1"><a class="observablehq-header-anchor" href="#title-race">Title Race</a></h2>
@@ -346,7 +457,7 @@ Plot.plot({
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="next" href="./positions"><span>Position Grid</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-24T23:07:39">Aug 24, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-24T23:34:11">Aug 24, 2026</a>.</div>
 </footer>
 </div>
 </body>
