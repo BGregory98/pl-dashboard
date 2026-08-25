@@ -165,10 +165,10 @@ document.body.appendChild(themeBtn);
 return {themeBtn,root,getTheme,updateIcon};
 }});
 
-define({id: "45d04559", inputs: ["FileAttachment"], outputs: ["seasons","summary","fixtures"], body: (FileAttachment) => {
+define({id: "0cb5e56d", inputs: ["FileAttachment"], outputs: ["seasons","summary","fixtures"], body: (FileAttachment) => {
 const seasons = FileAttachment("./data/seasons.json").json();
 const summary = FileAttachment("./data/summary.csv").csv({typed: true});
-const fixtures = FileAttachment("./data/fixtures.csv").csv({typed: true});
+const fixtures = FileAttachment("./data/fixtures.csv").csv();
 return {seasons,summary,fixtures};
 }});
 
@@ -858,7 +858,7 @@ Plot.plot({
   }
 </style>
 <div class="observablehq observablehq--block"><!--:f3935fbc:--></div>
-<div class="observablehq observablehq--block"><!--:45d04559:--></div>
+<div class="observablehq observablehq--block"><!--:0cb5e56d:--></div>
 <div class="observablehq observablehq--block"><!--:40d131f0:--></div>
 <div class="observablehq observablehq--block"><!--:b1938df0:--></div>
 <h1 id="" tabindex="-1"><a class="observablehq-header-anchor" href="#"><observablehq-loading></observablehq-loading><!--:8f8e24f6:--></a></h1>
@@ -889,7 +889,7 @@ Plot.plot({
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="next" href="./positions"><span>Position Grid</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T13:10:01">Aug 25, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T13:27:13">Aug 25, 2026</a>.</div>
 </footer>
 </div>
 </body>
