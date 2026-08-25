@@ -153,134 +153,55 @@ n
 ))
 }});
 
-define({id: "47c117e2", inputs: ["prevMap","latest"], outputs: ["delta","fmtPct","fmtDelta","deltaClass","relegDeltaClass","rows"], body: (prevMap,latest) => {
-function delta(cur, club, field) {
-  const p = prevMap.get(club);
-  if (!p) return null;
-  return cur - p[field];
-}
-
+define({id: "336f5865", inputs: ["prevMap","latest","short","display","html"], outputs: ["fmtPct","chg","chgPts","rowCls","tableRows"], body: (prevMap,latest,short,display,html) => {
 function fmtPct(v) {
-  if (v < 0.001) return "—";
+  if (v < 0.001) return '<span class="dim">—</span>';
   if (v >= 0.995) return "99+";
   return (v * 100).toFixed(1);
 }
 
-function fmtDelta(d) {
-  if (d === null) return "";
+function chg(cur, club, field, invert) {
+  const p = prevMap.get(club);
+  if (!p) return "";
+  const d = cur - p[field];
   const pp = d * 100;
   if (Math.abs(pp) < 0.05) return "";
   const sign = pp > 0 ? "+" : "";
-  return sign + pp.toFixed(1);
+  const cls = invert ? (d > 0 ? "dn" : "up") : (d > 0 ? "up" : "dn");
+  return `<span class="chg ${cls}">${sign}${pp.toFixed(1)}</span>`;
 }
 
-function deltaClass(d) {
-  if (d === null || Math.abs(d) < 0.0005) return "neutral";
-  return d > 0 ? "up" : "down";
+function chgPts(cur, club) {
+  const p = prevMap.get(club);
+  if (!p) return "";
+  const d = cur - p.exp_pts;
+  if (Math.abs(d) < 0.05) return "";
+  const sign = d > 0 ? "+" : "";
+  const cls = d > 0 ? "up" : "dn";
+  return `<span class="chg ${cls}">${sign}${d.toFixed(1)}</span>`;
 }
 
-function relegDeltaClass(d) {
-  if (d === null || Math.abs(d) < 0.0005) return "neutral";
-  return d > 0 ? "down" : "up";
-}
-
-const rows = latest.map((d, i) => {
-  const dTitle = delta(d.p_title, d.club, "p_title");
-  const dTop4  = delta(d.p_top4, d.club, "p_top4");
-  const dReleg = delta(d.p_releg, d.club, "p_releg");
-  const dXpts  = delta(d.exp_pts, d.club, "exp_pts");
-  return { ...d, rank: i + 1, dTitle, dTop4, dReleg, dXpts };
-});
-return {delta,fmtPct,fmtDelta,deltaClass,relegDeltaClass,rows};
-}});
-
-define({id: "c1ac818d", inputs: ["html"], outputs: ["tableStyle"], body: (html) => {
-const tableStyle = html`<style>
-  .pred-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-    font-variant-numeric: tabular-nums;
-  }
-  .pred-table th {
-    position: sticky;
-    top: 0;
-    background: var(--theme-background, #fff);
-    border-bottom: 2px solid #2a2a26;
-    padding: 6px 8px;
-    text-align: right;
-    font-weight: 600;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #6b6b6b;
-    white-space: nowrap;
-  }
-  .pred-table th:nth-child(1), .pred-table th:nth-child(2) { text-align: left; }
-  .pred-table td {
-    padding: 7px 8px;
-    text-align: right;
-    border-bottom: 1px solid #eee;
-    white-space: nowrap;
-  }
-  .pred-table td:nth-child(1) { text-align: center; color: #6b6b6b; width: 30px; }
-  .pred-table td:nth-child(2) { text-align: left; font-weight: 500; }
-  .pred-table tr:hover td { background: #f8f8f6; }
-  .pred-table .val { font-weight: 500; }
-  .pred-table .chg { font-size: 11px; margin-left: 2px; }
-  .pred-table .chg.up { color: #2a9d4e; }
-  .pred-table .chg.down { color: #d94a4a; }
-  .pred-table .chg.neutral { color: #bbb; }
-  .pred-table .dim { color: #bbb; }
-  .pred-table .hi-title { background: #eef6ee; }
-  .pred-table .hi-top4 { background: #eef2f8; }
-  .pred-table .hi-releg { background: #fdf0ef; }
-  @media (max-width: 600px) {
-    .pred-table { font-size: 13px; }
-    .pred-table th, .pred-table td { padding: 5px 4px; }
-    .pred-table .chg { display: block; margin-left: 0; }
-  }
-</style>`;
-return {tableStyle};
-}});
-
-define({id: "33ab2159", inputs: ["html","tableStyle","rows","short","deltaClass","fmtPct","fmtDelta","relegDeltaClass"], outputs: ["rowClass","table"], body: (html,tableStyle,rows,short,deltaClass,fmtPct,fmtDelta,relegDeltaClass) => {
-function rowClass(d) {
+function rowCls(d) {
   if (d.p_title > 0.05) return "hi-title";
   if (d.p_top4 > 0.3) return "hi-top4";
   if (d.p_releg > 0.1) return "hi-releg";
   return "";
 }
 
-const table = html`${tableStyle}
-<table class="pred-table">
-<thead><tr>
-  <th>#</th><th>Club</th><th>xPts</th><th>Title</th><th>Top 4</th><th>Releg</th>
-</tr></thead>
-<tbody>
-${rows.map(d => html`<tr class="${rowClass(d)}">
-  <td>${d.rank}</td>
+const tableRows = latest.map((d, i) => `<tr class="${rowCls(d)}">
+  <td>${i + 1}</td>
   <td>${short(d.club)}</td>
-  <td>
-    <span class="val">${d.exp_pts.toFixed(1)}</span>
-    <span class="chg ${deltaClass(d.dXpts)}">${d.dXpts !== null && Math.abs(d.dXpts) >= 0.05 ? (d.dXpts > 0 ? "+" : "") + d.dXpts.toFixed(1) : ""}</span>
-  </td>
-  <td>
-    <span class="val ${d.p_title < 0.001 ? "dim" : ""}">${fmtPct(d.p_title)}</span>
-    <span class="chg ${deltaClass(d.dTitle)}">${fmtDelta(d.dTitle)}</span>
-  </td>
-  <td>
-    <span class="val ${d.p_top4 < 0.001 ? "dim" : ""}">${fmtPct(d.p_top4)}</span>
-    <span class="chg ${deltaClass(d.dTop4)}">${fmtDelta(d.dTop4)}</span>
-  </td>
-  <td>
-    <span class="val ${d.p_releg < 0.001 ? "dim" : ""}">${fmtPct(d.p_releg)}</span>
-    <span class="chg ${relegDeltaClass(d.dReleg)}">${fmtDelta(d.dReleg)}</span>
-  </td>
-</tr>`)}
-</tbody>
-</table>`;
-return {rowClass,table};
+  <td><span class="val">${d.exp_pts.toFixed(1)}</span> ${chgPts(d.exp_pts, d.club)}</td>
+  <td>${fmtPct(d.p_title)} ${chg(d.p_title, d.club, "p_title", false)}</td>
+  <td>${fmtPct(d.p_top4)} ${chg(d.p_top4, d.club, "p_top4", false)}</td>
+  <td>${fmtPct(d.p_releg)} ${chg(d.p_releg, d.club, "p_releg", true)}</td>
+</tr>`).join("\n");
+
+display(html`<div style="overflow-x:auto"><table class="pred-table">
+<thead><tr><th>#</th><th>Club</th><th>xPts</th><th>Title</th><th>Top 4</th><th>Releg</th></tr></thead>
+<tbody>${tableRows}</tbody>
+</table></div>`);
+return {fmtPct,chg,chgPts,rowCls,tableRows};
 }});
 
 define({id: "8eed031f", inputs: ["sd","Plot","n","maxMw","showLabels","short","d3","width","labelMr"], outputs: ["braid"], body: (sd,Plot,n,maxMw,showLabels,short,d3,width,labelMr) => {
@@ -435,6 +356,54 @@ Plot.plot({
 <script>{const e=document.querySelector("#observablehq-sidebar"),o=document.querySelector("#observablehq-sidebar-toggle"),r=sessionStorage.getItem("observablehq-sidebar");r?o.checked=r==="true":o.indeterminate=!0;for(const t of document.querySelectorAll("#observablehq-sidebar summary")){const s=t.parentElement;switch(sessionStorage.getItem(`observablehq-sidebar:${t.textContent}`)){case"true":s.open=!0;break;case"false":s.classList.contains("observablehq-section-active")||(s.open=!1);break}}addEventListener("beforeunload",()=>sessionStorage.setItem("observablehq-sidebar-scrolly",`${e.scrollTop}`));const a=sessionStorage.getItem("observablehq-sidebar-scrolly");a!=null&&(e.style.cssText="overflow: hidden;",e.scrollTop=+a,e.style.cssText="");}</script>
 <div id="observablehq-center">
 <main id="observablehq-main" class="observablehq">
+<style>
+  .pred-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+  .pred-table th {
+    position: sticky;
+    top: 0;
+    background: var(--theme-background, #fff);
+    border-bottom: 2px solid #2a2a26;
+    padding: 6px 8px;
+    text-align: right;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6b6b6b;
+    white-space: nowrap;
+  }
+  .pred-table th:nth-child(1), .pred-table th:nth-child(2) { text-align: left; }
+  .pred-table td {
+    padding: 7px 8px;
+    text-align: right;
+    border-bottom: 1px solid #eee;
+    white-space: nowrap;
+  }
+  .pred-table td:nth-child(1) { text-align: center; color: #6b6b6b; width: 30px; }
+  .pred-table td:nth-child(2) { text-align: left; font-weight: 500; }
+  .pred-table tr:hover td { background: #f8f8f6; }
+  .pred-table .val { font-weight: 500; }
+  .pred-table .chg { font-size: 11px; margin-left: 2px; }
+  .pred-table .up { color: #2a9d4e; }
+  .pred-table .dn { color: #d94a4a; }
+  .pred-table .dim { color: #bbb; }
+  .pred-table .hi-title td { background: #f2f8f2; }
+  .pred-table .hi-top4 td { background: #f0f4fa; }
+  .pred-table .hi-releg td { background: #fdf2f0; }
+  .pred-table tr.hi-title:hover td { background: #e8f2e8; }
+  .pred-table tr.hi-top4:hover td { background: #e4ecf6; }
+  .pred-table tr.hi-releg:hover td { background: #f8e8e4; }
+  @media (max-width: 600px) {
+    .pred-table { font-size: 13px; }
+    .pred-table th, .pred-table td { padding: 5px 4px; }
+    .pred-table .chg { display: block; margin-left: 0; }
+  }
+</style>
 <div class="observablehq observablehq--block"><!--:9cb0d82a:--></div>
 <div class="observablehq observablehq--block"><!--:40d131f0:--></div>
 <div class="observablehq observablehq--block"><!--:c09204d9:--></div>
@@ -442,11 +411,7 @@ Plot.plot({
 <p><small>Matchweek <observablehq-loading></observablehq-loading><!--:22beed87:--> · <observablehq-loading></observablehq-loading><!--:1b16b1df:--> clubs · Dixon-Coles model · 10,000 simulations</small></p>
 <hr>
 <h2 id="predictions" tabindex="-1"><a class="observablehq-header-anchor" href="#predictions">Predictions</a></h2>
-<div class="observablehq observablehq--block"><!--:47c117e2:--></div>
-<div class="observablehq observablehq--block"><!--:c1ac818d:--></div>
-<div style="overflow-x: auto;">
-<div class="observablehq observablehq--block"><!--:33ab2159:--></div>
-</div>
+<div class="observablehq observablehq--block"><!--:336f5865:--></div>
 <hr>
 <h2 id="position-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#position-trajectory">Position Trajectory</a></h2>
 <div class="observablehq observablehq--block"><!--:8eed031f:--></div>
@@ -457,7 +422,7 @@ Plot.plot({
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="next" href="./positions"><span>Position Grid</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-24T23:34:11">Aug 24, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-24T23:39:24">Aug 24, 2026</a>.</div>
 </footer>
 </div>
 </body>
