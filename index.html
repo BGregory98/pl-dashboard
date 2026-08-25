@@ -100,6 +100,24 @@ import {registerFile} from "./_observablehq/stdlib.81cd90e3.js";
 registerFile("./data/seasons.json", {"name":"./data/seasons.json","mimeType":"application/json","path":"./_file/data/seasons.3375a9bd.json","lastModified":1787625417771,"size":351});
 registerFile("./data/summary.csv", {"name":"./data/summary.csv","mimeType":"text/csv","path":"./_file/data/summary.33c36dda.csv","lastModified":1787626196615,"size":4576305});
 
+define({id: "f3935fbc", outputs: ["themeBtn","root","getTheme","updateIcon"], body: () => {
+const themeBtn = document.createElement("button");
+themeBtn.className = "theme-btn";
+const root = document.documentElement;
+function getTheme() {
+  return root.getAttribute("data-theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+}
+function updateIcon() { themeBtn.textContent = getTheme() === "dark" ? "☀️" : "🌙"; }
+themeBtn.onclick = () => {
+  const next = getTheme() === "dark" ? "light" : "dark";
+  root.setAttribute("data-theme", next);
+  updateIcon();
+};
+updateIcon();
+document.body.appendChild(themeBtn);
+return {themeBtn,root,getTheme,updateIcon};
+}});
+
 define({id: "9cb0d82a", inputs: ["FileAttachment"], outputs: ["seasons","summary"], body: (FileAttachment) => {
 const seasons = FileAttachment("./data/seasons.json").json();
 const summary = FileAttachment("./data/summary.csv").csv({typed: true});
@@ -301,7 +319,7 @@ const braid = sd.filter(d => d.mw > 0).map(d => ({...d, pos: d.pos_now}));
 return {braid};
 }});
 
-define({id: "44e95d4e", inputs: ["Plot","n","braid","maxMw","showLabels","short","xDomain","d3","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,n,braid,maxMw,showLabels,short,xDomain,d3,colorDomain,colorRange,width,labelMr,display) => {
+define({id: "0db5dd11", inputs: ["Plot","n","braid","maxMw","showLabels","short","xDomain","d3","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,n,braid,maxMw,showLabels,short,xDomain,d3,colorDomain,colorRange,width,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
@@ -328,17 +346,7 @@ Plot.plot({
       dx: 10,
       textAnchor: "start",
       fontSize: 11
-    }) : null,
-    Plot.tip(braid, Plot.pointer({
-      x: "mw",
-      y: "pos",
-      stroke: "club",
-      channels: {
-        "Pts": "pts_now",
-        "GD": {value: d => `${d.gd_now >= 0 ? "+" : ""}${d.gd_now}`},
-        "Played": "played"
-      }
-    }))
+    }) : null
   ].filter(Boolean),
   x: {label: "Matchweek", domain: xDomain},
   y: {
@@ -426,12 +434,12 @@ Plot.plot({
 ))
 }});
 
-define({id: "4055369b", inputs: ["repel","latest"], outputs: ["ptsLabels"], body: (repel,latest) => {
-const ptsLabels = repel(latest, "exp_pts", 2.5);
+define({id: "b12383de", inputs: ["repel","latest"], outputs: ["ptsLabels"], body: (repel,latest) => {
+const ptsLabels = repel(latest, "exp_pts", 1.5);
 return {ptsLabels};
 }});
 
-define({id: "c8e61000", inputs: ["Plot","sd","latest","showLabels","ptsLabels","short","xDomain","colorDomain","colorRange","width","n","labelMr","display"], body: async (Plot,sd,latest,showLabels,ptsLabels,short,xDomain,colorDomain,colorRange,width,n,labelMr,display) => {
+define({id: "909d1634", inputs: ["Plot","sd","latest","showLabels","ptsLabels","short","xDomain","colorDomain","colorRange","width","n","labelMr","display"], body: async (Plot,sd,latest,showLabels,ptsLabels,short,xDomain,colorDomain,colorRange,width,n,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
@@ -471,7 +479,7 @@ Plot.plot({
   y: {label: "Projected final points"},
   color: {domain: colorDomain, range: colorRange, legend: false},
   width,
-  height: Math.max(400, n * 22),
+  height: Math.max(800, n * 44),
   marginRight: labelMr
 })
 ))
@@ -608,6 +616,20 @@ Plot.plot({
 <div id="observablehq-center">
 <main id="observablehq-main" class="observablehq">
 <style>
+  .theme-btn {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    z-index: 1000;
+    background: var(--theme-background, #fff);
+    border: 1px solid var(--tbl-border, #ccc);
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
   .pred-table {
     width: 100%;
     border-collapse: collapse;
@@ -653,6 +675,7 @@ Plot.plot({
     .pred-table .chg { display: block; margin-left: 0; }
   }
 </style>
+<div class="observablehq observablehq--block"><!--:f3935fbc:--></div>
 <div class="observablehq observablehq--block"><!--:9cb0d82a:--></div>
 <div class="observablehq observablehq--block"><!--:40d131f0:--></div>
 <div class="observablehq observablehq--block"><!--:ad1f3f26:--></div>
@@ -664,13 +687,13 @@ Plot.plot({
 <hr>
 <h2 id="position-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#position-trajectory">Position Trajectory</a></h2>
 <div class="observablehq observablehq--block"><!--:282a376d:--></div>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:44e95d4e:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:0db5dd11:--></div>
 <h2 id="expected-positions" tabindex="-1"><a class="observablehq-header-anchor" href="#expected-positions">Expected Positions</a></h2>
 <div class="observablehq observablehq--block"><!--:ac3fd42e:--></div>
 <div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:8df1521b:--></div>
 <h2 id="points-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#points-trajectory">Points Trajectory</a></h2>
-<div class="observablehq observablehq--block"><!--:4055369b:--></div>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:c8e61000:--></div>
+<div class="observablehq observablehq--block"><!--:b12383de:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:909d1634:--></div>
 <h2 id="title-race" tabindex="-1"><a class="observablehq-header-anchor" href="#title-race">Title Race</a></h2>
 <div class="observablehq observablehq--block"><!--:cc55dbb1:--></div>
 <div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:a80f4937:--></div>
@@ -680,7 +703,7 @@ Plot.plot({
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="next" href="./positions"><span>Position Grid</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T12:17:27">Aug 25, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T12:26:49">Aug 25, 2026</a>.</div>
 </footer>
 </div>
 </body>
