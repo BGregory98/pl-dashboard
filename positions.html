@@ -18,7 +18,6 @@
 <link rel="modulepreload" href="./_npm/d3@7.9.0/080cf928.js">
 <link rel="modulepreload" href="./_npm/htl@1.0.0/11521f02.js">
 <link rel="modulepreload" href="./_observablehq/stdlib/inputs.8ddbf299.js">
-<link rel="modulepreload" href="./_npm/@observablehq/plot@0.6.17/93ce672e.js">
 <link rel="modulepreload" href="./_npm/isoformat@0.2.1/604cb63b.js">
 <link rel="modulepreload" href="./_npm/d3-array@3.2.4/b8e751b6.js">
 <link rel="modulepreload" href="./_npm/d3-axis@3.0.0/c662ea05.js">
@@ -50,10 +49,8 @@
 <link rel="modulepreload" href="./_npm/d3-timer@3.0.1/e99232db.js">
 <link rel="modulepreload" href="./_npm/d3-transition@3.0.1/bd07fd9a.js">
 <link rel="modulepreload" href="./_npm/d3-zoom@3.0.0/d09f7cc9.js">
-<link rel="modulepreload" href="./_npm/interval-tree-1d@1.0.4/f53f17b2.js">
 <link rel="modulepreload" href="./_npm/internmap@2.0.3/af036d7e.js">
 <link rel="modulepreload" href="./_npm/delaunator@5.1.0/7b06abe7.js">
-<link rel="modulepreload" href="./_npm/binary-search-bounds@2.0.5/5f640032.js">
 <link rel="modulepreload" href="./_npm/robust-predicates@3.0.3/b42f30a7.js">
 <style>
     :root {
@@ -67,60 +64,36 @@
 import {define} from "./_observablehq/client.c543f8ba.js";
 import {registerFile} from "./_observablehq/stdlib.81cd90e3.js";
 
-registerFile("./data/positions.json", {"name":"./data/positions.json","mimeType":"application/json","path":"./_file/data/positions.e802c80b.json","lastModified":1787625997154,"size":3056664});
-registerFile("./data/seasons.json", {"name":"./data/seasons.json","mimeType":"application/json","path":"./_file/data/seasons.3375a9bd.json","lastModified":1787625417771,"size":351});
+registerFile("./data/grid-manifest.json", {"name":"./data/grid-manifest.json","mimeType":"application/json","path":"./_file/data/grid-manifest.825ddeda.json","lastModified":1787663302568,"size":631});
 
-define({id: "2b1f4f21", inputs: ["FileAttachment"], outputs: ["positions","seasons"], body: (FileAttachment) => {
-const positions = FileAttachment("./data/positions.json").json();
-const seasons = FileAttachment("./data/seasons.json").json();
-return {positions,seasons};
+define({id: "71646a04", inputs: ["FileAttachment"], outputs: ["manifest"], body: (FileAttachment) => {
+const manifest = FileAttachment("./data/grid-manifest.json").json();
+return {manifest};
 }});
 
-define({id: "40d131f0", inputs: ["view","Inputs","seasons"], outputs: ["season"], body: (view,Inputs,seasons) => {
-const season = view(Inputs.select(seasons.toReversed(), {
-  value: seasons.at(-1),
+define({id: "966924ec", inputs: ["manifest","view","Inputs"], outputs: ["allSeasons","season"], body: (manifest,view,Inputs) => {
+const allSeasons = Object.keys(manifest).sort();
+const season = view(Inputs.select(allSeasons.toReversed(), {
+  value: allSeasons.at(-1),
   label: "Season"
 }));
-return {season};
+return {allSeasons,season};
 }});
 
-define({id: "c7fa07fd", inputs: ["positions","season"], outputs: ["sd","mws","clubs","nClubs","SHORT","short"], body: (positions,season) => {
-const sd = positions[season];
-const mws = sd.mws;
-const clubs = sd.clubs;
-const nClubs = clubs.length;
+define({id: "0723fc42", inputs: ["manifest","season","view","Inputs","d3"], outputs: ["mws","mw"], body: (manifest,season,view,Inputs,d3) => {
+const mws = manifest[season];
+const mw = view(Inputs.range([d3.min(mws), d3.max(mws)], {
+  step: 1,
+  value: d3.max(mws),
+  label: "Matchweek"
+}));
+return {mws,mw};
+}});
 
-const SHORT = new Map([
-  ["AFC Bournemouth", "Bournemouth"],
-  ["Brighton & Hove Albion", "Brighton"],
-  ["Manchester City", "Man City"],
-  ["Manchester United", "Man Utd"],
-  ["Newcastle United", "Newcastle"],
-  ["Nottingham Forest", "Nott'm Forest"],
-  ["Tottenham Hotspur", "Spurs"],
-  ["Sheffield Wednesday", "Sheff Wed"],
-  ["Sheffield United", "Sheff Utd"],
-  ["West Bromwich Albion", "West Brom"],
-  ["West Ham United", "West Ham"],
-  ["Wolverhampton Wanderers", "Wolves"],
-  ["Queens Park Rangers", "QPR"],
-  ["Bolton Wanderers", "Bolton"],
-  ["Blackburn Rovers", "Blackburn"],
-  ["Huddersfield Town", "Huddersfield"],
-  ["Leicester City", "Leicester"],
-  ["Coventry City", "Coventry"],
-  ["Hull City", "Hull"],
-  ["Ipswich Town", "Ipswich"],
-  ["Leeds United", "Leeds"],
-  ["Stoke City", "Stoke"],
-  ["Swansea City", "Swansea"],
-  ["Cardiff City", "Cardiff"],
-  ["Norwich City", "Norwich"],
-  ["Derby County", "Derby"],
-  ["Middlesbrough", "Boro"],
-]);
-const short = name => SHORT.get(name) ?? name;
-return {sd,mws,clubs,nClubs,SHORT,short};
+define({id: "73a9ca08", inputs: ["mws","mw","season"], outputs: ["nearest","src"], body: (mws,mw,season) => {
+const nearest = mws.reduce((best, v) => Math.abs(v - mw) < Math.abs(best - mw) ? v : best, mws[0]);
+const src = `../grids/grid_${season}_mw${nearest}.png`;
+return {nearest,src};
 }});
 
 define({id: "8f8e24f6", mode: "inline", inputs: ["season","display"], body: async (season,display) => {
@@ -129,118 +102,22 @@ season
 ))
 }});
 
-define({id: "71329a16", inputs: ["view","Inputs","d3","mws"], outputs: ["mw"], body: (view,Inputs,d3,mws) => {
-const mw = view(Inputs.range([d3.min(mws), d3.max(mws)], {
-  step: 1,
-  value: d3.max(mws),
-  label: "Matchweek"
-}));
-return {mw};
-}});
-
-define({id: "229401d1", inputs: ["view","Inputs"], outputs: ["mode"], body: (view,Inputs) => {
-const mode = view(Inputs.radio(["Probability", "Change"], {value: "Probability"}));
-return {mode};
-}});
-
-define({id: "93434a8b", inputs: ["sd","mw","clubs","mws","mode","nClubs"], outputs: ["matrix","sorted","prevMwIdx","prevMw","prevMatrix","showChange","gridData","sortedClubs"], body: (sd,mw,clubs,mws,mode,nClubs) => {
-const matrix = sd.grid[mw];
-
-const sorted = clubs.map((club, ci) => ({
-  club,
-  ci,
-  ep: matrix[ci].reduce((sum, p, pi) => sum + p * (pi + 1), 0)
-})).sort((a, b) => a.ep - b.ep);
-
-const prevMwIdx = mws.indexOf(mw);
-const prevMw = prevMwIdx > 0 ? mws[prevMwIdx - 1] : null;
-const prevMatrix = prevMw !== null ? sd.grid[prevMw] : null;
-const showChange = mode === "Change" && prevMatrix !== null;
-
-const gridData = sorted.flatMap(({club, ci}) =>
-  Array.from({length: nClubs}, (_, pi) => {
-    const p = matrix[ci][pi];
-    const pp = prevMatrix ? prevMatrix[ci][pi] : 0;
-    return {club, pos: pi + 1, p, dp: prevMatrix ? p - pp : 0};
-  })
-);
-
-const sortedClubs = sorted.map(d => d.club);
-return {matrix,sorted,prevMwIdx,prevMw,prevMatrix,showChange,gridData,sortedClubs};
-}});
-
-define({id: "b7e53059", mode: "inline", inputs: ["showChange","prevMw","mw","display"], body: async (showChange,prevMw,mw,display) => {
+define({id: "4ad71c2c", mode: "inline", inputs: ["nearest","display"], body: async (nearest,display) => {
 display(await(
-showChange ? `Change from matchweek ${prevMw} → ${mw}` : `Matchweek ${mw}`
+nearest
 ))
 }});
 
-define({id: "a4118327", mode: "inline", inputs: ["mode","prevMatrix","html","display"], body: async (mode,prevMatrix,html,display) => {
+define({id: "f02fe96f", mode: "inline", inputs: ["nearest","mw","html","mws","display"], body: async (nearest,mw,html,mws,display) => {
 display(await(
-mode === "Change" && !prevMatrix ? html`<div style="padding:8px 12px;background:#fff3cd;border-radius:4px;margin-bottom:12px;font-size:14px">No previous matchweek — showing probabilities.</div>` : ""
+nearest !== mw ? html`<div style="padding:8px 12px;background:#fff3cd;border-radius:4px;margin-bottom:12px;font-size:14px">Showing nearest available matchweek (${nearest}). Available: ${mws.join(", ")}.</div>` : ""
 ))
 }});
 
-define({id: "4d5eff34", inputs: ["showChange","d3","gridData","width","Plot","short","prevMatrix","nClubs","sortedClubs"], outputs: ["fillField","maxP","maxDp","colorConfig","textThreshold","textFilter","textLabel","ml","showCellText","cellFontSize"], body: (showChange,d3,gridData,width,Plot,short,prevMatrix,nClubs,sortedClubs) => {
-const fillField = showChange ? "dp" : "p";
-
-const maxP = d3.max(gridData, d => d.p);
-const maxDp = d3.max(gridData, d => Math.abs(d.dp)) || 0.01;
-
-const colorConfig = showChange
-  ? {scheme: "RdBu", domain: [-maxDp, maxDp], pivot: 0, legend: true, label: "Δ probability"}
-  : {scheme: "YlGnBu", domain: [0, maxP], legend: true, label: "Probability"};
-
-const textThreshold = showChange ? 0.005 : 0.01;
-const textFilter = d => showChange ? Math.abs(d.dp) >= textThreshold : d.p >= textThreshold;
-const textLabel = d => showChange
-  ? `${d.dp > 0 ? "+" : ""}${Math.round(d.dp * 100)}`
-  : `${Math.round(d.p * 100)}`;
-
-const ml = width < 500 ? 90 : 140;
-const showCellText = width >= 400;
-const cellFontSize = width < 600 ? 8 : 10;
-
-Plot.plot({
-  marks: [
-    Plot.cell(gridData, {
-      x: "pos",
-      y: "club",
-      fill: fillField,
-      inset: 0.5,
-      title: d => `${short(d.club)} → pos ${d.pos}\n${(d.p * 100).toFixed(1)}%${prevMatrix ? ` (${d.dp >= 0 ? "+" : ""}${(d.dp * 100).toFixed(1)}%)` : ""}`
-    }),
-    showCellText ? Plot.text(gridData.filter(textFilter), {
-      x: "pos",
-      y: "club",
-      text: textLabel,
-      fill: d => {
-        const v = showChange ? Math.abs(d.dp) : d.p;
-        return v > 0.25 ? "white" : "#333";
-      },
-      fontSize: cellFontSize,
-      fontWeight: 500
-    }) : null
-  ].filter(Boolean),
-  x: {
-    label: "Finishing position",
-    domain: d3.range(1, nClubs + 1),
-    padding: 0,
-    tickFormat: d => d
-  },
-  y: {
-    label: null,
-    domain: sortedClubs,
-    padding: 0,
-    tickFormat: d => short(d)
-  },
-  color: colorConfig,
-  width,
-  height: nClubs * 30 + 80,
-  marginLeft: ml,
-  marginBottom: 40
-})
-return {fillField,maxP,maxDp,colorConfig,textThreshold,textFilter,textLabel,ml,showCellText,cellFontSize};
+define({id: "dfc7c069", inputs: ["html","src","season","nearest","display"], body: async (html,src,season,nearest,display) => {
+display(await(
+html`<img src="${src}" style="max-width:100%;height:auto;" alt="Position grid ${season} MW ${nearest}">`
+))
 }});
 
 </script>
@@ -260,20 +137,18 @@ return {fillField,maxP,maxDp,colorConfig,textThreshold,textFilter,textLabel,ml,s
 <script>{const e=document.querySelector("#observablehq-sidebar"),o=document.querySelector("#observablehq-sidebar-toggle"),r=sessionStorage.getItem("observablehq-sidebar");r?o.checked=r==="true":o.indeterminate=!0;for(const t of document.querySelectorAll("#observablehq-sidebar summary")){const s=t.parentElement;switch(sessionStorage.getItem(`observablehq-sidebar:${t.textContent}`)){case"true":s.open=!0;break;case"false":s.classList.contains("observablehq-section-active")||(s.open=!1);break}}addEventListener("beforeunload",()=>sessionStorage.setItem("observablehq-sidebar-scrolly",`${e.scrollTop}`));const a=sessionStorage.getItem("observablehq-sidebar-scrolly");a!=null&&(e.style.cssText="overflow: hidden;",e.scrollTop=+a,e.style.cssText="");}</script>
 <div id="observablehq-center">
 <main id="observablehq-main" class="observablehq">
-<div class="observablehq observablehq--block"><!--:2b1f4f21:--></div>
-<div class="observablehq observablehq--block"><!--:40d131f0:--></div>
-<div class="observablehq observablehq--block"><!--:c7fa07fd:--></div>
+<div class="observablehq observablehq--block"><!--:71646a04:--></div>
+<div class="observablehq observablehq--block"><!--:966924ec:--></div>
+<div class="observablehq observablehq--block"><!--:0723fc42:--></div>
+<div class="observablehq observablehq--block"><!--:73a9ca08:--></div>
 <h1 id="position-grid" tabindex="-1"><a class="observablehq-header-anchor" href="#position-grid">Position Grid — <observablehq-loading></observablehq-loading><!--:8f8e24f6:--></a></h1>
-<div class="observablehq observablehq--block"><!--:71329a16:--></div>
-<div class="observablehq observablehq--block"><!--:229401d1:--></div>
-<div class="observablehq observablehq--block"><!--:93434a8b:--></div>
-<p><small><observablehq-loading></observablehq-loading><!--:b7e53059:--> · each row sums to 100%</small></p>
-<p><observablehq-loading></observablehq-loading><!--:a4118327:--></p>
-<div class="observablehq observablehq--block"><!--:4d5eff34:--></div>
+<p><small>Matchweek <observablehq-loading></observablehq-loading><!--:4ad71c2c:--> · probability of finishing in each position (10,000 simulations)</small></p>
+<p><observablehq-loading></observablehq-loading><!--:f02fe96f:--></p>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:dfc7c069:--></div>
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="prev" href="./"><span>English Football</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T00:25:01">Aug 25, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T09:08:20">Aug 25, 2026</a>.</div>
 </footer>
 </div>
 </body>
