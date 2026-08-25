@@ -292,21 +292,15 @@ Plot.plot({
 ))
 }});
 
-define({id: "c6ebd820", inputs: ["sd","d3","maxMw"], outputs: ["expBraid","expLatest"], body: (sd,d3,maxMw) => {
+define({id: "ac3fd42e", inputs: ["d3","sd","maxMw"], outputs: ["expBraid","expLatest"], body: (d3,sd,maxMw) => {
 const expBraid = (() => {
-  const rows = sd.map(d => ({...d, lane: Math.round(d.exp_pos)}));
-  const byMw = d3.group(rows, d => d.mw);
+  const byMw = d3.group(sd, d => d.mw);
   const out = [];
   for (const [mw, group] of byMw) {
-    const byLane = d3.group(group, d => d.lane);
-    for (const [lane, tied] of byLane) {
-      tied.sort((a, b) => a.exp_pos - b.exp_pos);
-      const m = tied.length;
-      const pitch = Math.min(0.4, 0.8 / m);
-      tied.forEach((d, i) => {
-        out.push({...d, yPos: lane + (i - (m - 1) / 2) * pitch});
-      });
-    }
+    const sorted = [...group].sort((a, b) => a.exp_pos - b.exp_pos);
+    sorted.forEach((d, i) => {
+      out.push({...d, yPos: i + 1});
+    });
   }
   return out;
 })();
@@ -560,7 +554,7 @@ Plot.plot({
 <div class="observablehq observablehq--block"><!--:282a376d:--></div>
 <div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:93d11226:--></div>
 <h2 id="expected-positions" tabindex="-1"><a class="observablehq-header-anchor" href="#expected-positions">Expected Positions</a></h2>
-<div class="observablehq observablehq--block"><!--:c6ebd820:--></div>
+<div class="observablehq observablehq--block"><!--:ac3fd42e:--></div>
 <div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:7f0c522e:--></div>
 <h2 id="points-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#points-trajectory">Points Trajectory</a></h2>
 <div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:58ec7f22:--></div>
@@ -571,7 +565,7 @@ Plot.plot({
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="next" href="./positions"><span>Position Grid</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T00:21:18">Aug 25, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T00:25:01">Aug 25, 2026</a>.</div>
 </footer>
 </div>
 </body>
