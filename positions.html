@@ -181,7 +181,7 @@ mode === "Change" && !prevMatrix ? html`<div style="padding:8px 12px;background:
 ))
 }});
 
-define({id: "4d00cf99", inputs: ["showChange","d3","gridData","Plot","nClubs","sortedClubs","short","width"], outputs: ["fillField","maxP","maxDp","colorConfig","textThreshold","textFilter","textLabel"], body: (showChange,d3,gridData,Plot,nClubs,sortedClubs,short,width) => {
+define({id: "4d5eff34", inputs: ["showChange","d3","gridData","width","Plot","short","prevMatrix","nClubs","sortedClubs"], outputs: ["fillField","maxP","maxDp","colorConfig","textThreshold","textFilter","textLabel","ml","showCellText","cellFontSize"], body: (showChange,d3,gridData,width,Plot,short,prevMatrix,nClubs,sortedClubs) => {
 const fillField = showChange ? "dp" : "p";
 
 const maxP = d3.max(gridData, d => d.p);
@@ -197,20 +197,20 @@ const textLabel = d => showChange
   ? `${d.dp > 0 ? "+" : ""}${Math.round(d.dp * 100)}`
   : `${Math.round(d.p * 100)}`;
 
+const ml = width < 500 ? 90 : 140;
+const showCellText = width >= 400;
+const cellFontSize = width < 600 ? 8 : 10;
+
 Plot.plot({
   marks: [
     Plot.cell(gridData, {
       x: "pos",
       y: "club",
       fill: fillField,
-      inset: 1,
-      tip: true,
-      channels: {
-        Probability: d => `${(d.p * 100).toFixed(1)}%`,
-        Change: d => `${d.dp >= 0 ? "+" : ""}${(d.dp * 100).toFixed(1)}%`
-      }
+      inset: 0.5,
+      title: d => `${short(d.club)} → pos ${d.pos}\n${(d.p * 100).toFixed(1)}%${prevMatrix ? ` (${d.dp >= 0 ? "+" : ""}${(d.dp * 100).toFixed(1)}%)` : ""}`
     }),
-    Plot.text(gridData.filter(textFilter), {
+    showCellText ? Plot.text(gridData.filter(textFilter), {
       x: "pos",
       y: "club",
       text: textLabel,
@@ -218,10 +218,10 @@ Plot.plot({
         const v = showChange ? Math.abs(d.dp) : d.p;
         return v > 0.25 ? "white" : "#333";
       },
-      fontSize: 10,
+      fontSize: cellFontSize,
       fontWeight: 500
-    })
-  ],
+    }) : null
+  ].filter(Boolean),
   x: {
     label: "Finishing position",
     domain: d3.range(1, nClubs + 1),
@@ -235,12 +235,12 @@ Plot.plot({
     tickFormat: d => short(d)
   },
   color: colorConfig,
-  width: Math.min(width, 960),
-  height: nClubs * 32 + 80,
-  marginLeft: 140,
+  width,
+  height: nClubs * 30 + 80,
+  marginLeft: ml,
   marginBottom: 40
 })
-return {fillField,maxP,maxDp,colorConfig,textThreshold,textFilter,textLabel};
+return {fillField,maxP,maxDp,colorConfig,textThreshold,textFilter,textLabel,ml,showCellText,cellFontSize};
 }});
 
 </script>
@@ -269,11 +269,11 @@ return {fillField,maxP,maxDp,colorConfig,textThreshold,textFilter,textLabel};
 <div class="observablehq observablehq--block"><!--:93434a8b:--></div>
 <p><small><observablehq-loading></observablehq-loading><!--:b7e53059:--> · each row sums to 100%</small></p>
 <p><observablehq-loading></observablehq-loading><!--:a4118327:--></p>
-<div class="observablehq observablehq--block"><!--:4d00cf99:--></div>
+<div class="observablehq observablehq--block"><!--:4d5eff34:--></div>
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="prev" href="./"><span>English Football</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-24T22:49:52">Aug 24, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-24T23:07:39">Aug 24, 2026</a>.</div>
 </footer>
 </div>
 </body>

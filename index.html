@@ -84,7 +84,7 @@ const season = view(Inputs.select(seasons.toReversed(), {
 return {season};
 }});
 
-define({id: "6f5d8587", inputs: ["season","summary","d3"], outputs: ["endYear","sd","mws","maxMw","latest","n","SHORT","short","titleSet","relegSet"], body: (season,summary,d3) => {
+define({id: "33f4e381", inputs: ["season","summary","d3","width"], outputs: ["endYear","sd","mws","maxMw","latest","n","SHORT","short","labelMr","showLabels","titleSet","relegSet"], body: (season,summary,d3,width) => {
 const endYear = parseInt(season.split("-")[0]) + 1;
 const sd = summary.filter(d => d.season_end_year === endYear);
 const mws = [...new Set(sd.map(d => d.mw))].sort((a, b) => a - b);
@@ -123,9 +123,12 @@ const SHORT = new Map([
 ]);
 const short = name => SHORT.get(name) ?? name;
 
+const labelMr = width < 500 ? 0 : 100;
+const showLabels = width >= 500;
+
 const titleSet = new Set(sd.filter(d => d.p_title > 0.01).map(d => d.club));
 const relegSet = new Set(sd.filter(d => d.p_releg > 0.05).map(d => d.club));
-return {endYear,sd,mws,maxMw,latest,n,SHORT,short,titleSet,relegSet};
+return {endYear,sd,mws,maxMw,latest,n,SHORT,short,labelMr,showLabels,titleSet,relegSet};
 }});
 
 define({id: "8f8e24f6", mode: "inline", inputs: ["season","display"], body: async (season,display) => {
@@ -174,7 +177,7 @@ Inputs.table(
 ))
 }});
 
-define({id: "2a7825dc", inputs: ["sd","Plot","n","maxMw","short","d3","width"], outputs: ["braid"], body: (sd,Plot,n,maxMw,short,d3,width) => {
+define({id: "8eed031f", inputs: ["sd","Plot","n","maxMw","showLabels","short","d3","width","labelMr"], outputs: ["braid"], body: (sd,Plot,n,maxMw,showLabels,short,d3,width,labelMr) => {
 const braid = sd.map(d => ({
   ...d,
   pos: d.mw === 0 ? d.exp_pos : d.pos_now
@@ -190,7 +193,8 @@ Plot.plot({
       stroke: "club",
       curve: "bump-x",
       strokeWidth: 2.5,
-      strokeOpacity: 0.7
+      strokeOpacity: 0.7,
+      title: d => `${d.club}\nMW ${d.mw}: pos ${Math.round(d.pos)}, ${d.pts_now}pts`
     }),
     Plot.dot(braid.filter(d => d.mw === maxMw), {
       x: "mw",
@@ -198,21 +202,15 @@ Plot.plot({
       fill: "club",
       r: 4
     }),
-    Plot.text(braid.filter(d => d.mw === maxMw), {
+    showLabels ? Plot.text(braid.filter(d => d.mw === maxMw), {
       x: "mw",
       y: "pos",
       text: d => short(d.club),
       dx: 10,
       textAnchor: "start",
       fontSize: 11
-    }),
-    Plot.tip(braid, Plot.pointer({
-      x: "mw",
-      y: "pos",
-      stroke: "club",
-      channels: {Points: "pts_now", GD: "gd_now"}
-    }))
-  ],
+    }) : null
+  ].filter(Boolean),
   x: {label: "Matchweek", domain: [0, Math.max(maxMw + 4, 38)]},
   y: {
     reverse: true,
@@ -223,12 +221,12 @@ Plot.plot({
   color: {legend: false},
   width,
   height: Math.max(500, n * 28),
-  marginRight: 130
+  marginRight: labelMr
 })
 return {braid};
 }});
 
-define({id: "3f3ca3dc", inputs: ["Plot","sd","titleSet","latest","short","width","display"], body: async (Plot,sd,titleSet,latest,short,width,display) => {
+define({id: "01da39fa", inputs: ["Plot","sd","titleSet","latest","showLabels","short","width","labelMr","display"], body: async (Plot,sd,titleSet,latest,showLabels,short,width,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
@@ -243,7 +241,8 @@ Plot.plot({
       x: "mw",
       y: "p_title",
       stroke: "club",
-      strokeWidth: 2.5
+      strokeWidth: 2.5,
+      title: d => `${d.club}: ${(d.p_title * 100).toFixed(1)}%`
     }),
     Plot.dot(latest.filter(d => titleSet.has(d.club)), {
       x: "mw",
@@ -251,31 +250,26 @@ Plot.plot({
       fill: "club",
       r: 4
     }),
-    Plot.text(latest.filter(d => titleSet.has(d.club)), {
+    showLabels ? Plot.text(latest.filter(d => titleSet.has(d.club)), {
       x: "mw",
       y: "p_title",
       text: d => `${short(d.club)} ${(d.p_title * 100).toFixed(0)}%`,
       dx: 10,
       textAnchor: "start",
       fontSize: 11
-    }),
-    Plot.tip(sd.filter(d => titleSet.has(d.club)), Plot.pointer({
-      x: "mw",
-      y: "p_title",
-      stroke: "club"
-    }))
-  ],
+    }) : null
+  ].filter(Boolean),
   x: {label: "Matchweek"},
-  y: {label: "Title probability", percent: true, domain: [0, undefined]},
+  y: {label: "Title probability", percent: true},
   color: {legend: false},
   width,
   height: 350,
-  marginRight: 130
+  marginRight: labelMr
 })
 ))
 }});
 
-define({id: "1956301e", inputs: ["Plot","sd","relegSet","latest","short","width","display"], body: async (Plot,sd,relegSet,latest,short,width,display) => {
+define({id: "61488019", inputs: ["Plot","sd","relegSet","latest","showLabels","short","width","labelMr","display"], body: async (Plot,sd,relegSet,latest,showLabels,short,width,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
@@ -290,7 +284,8 @@ Plot.plot({
       x: "mw",
       y: "p_releg",
       stroke: "club",
-      strokeWidth: 2.5
+      strokeWidth: 2.5,
+      title: d => `${d.club}: ${(d.p_releg * 100).toFixed(1)}%`
     }),
     Plot.dot(latest.filter(d => relegSet.has(d.club)), {
       x: "mw",
@@ -298,26 +293,21 @@ Plot.plot({
       fill: "club",
       r: 4
     }),
-    Plot.text(latest.filter(d => relegSet.has(d.club)), {
+    showLabels ? Plot.text(latest.filter(d => relegSet.has(d.club)), {
       x: "mw",
       y: "p_releg",
       text: d => `${short(d.club)} ${(d.p_releg * 100).toFixed(0)}%`,
       dx: 10,
       textAnchor: "start",
       fontSize: 11
-    }),
-    Plot.tip(sd.filter(d => relegSet.has(d.club)), Plot.pointer({
-      x: "mw",
-      y: "p_releg",
-      stroke: "club"
-    }))
-  ],
+    }) : null
+  ].filter(Boolean),
   x: {label: "Matchweek"},
-  y: {label: "Relegation probability", percent: true, domain: [0, undefined]},
+  y: {label: "Relegation probability", percent: true},
   color: {legend: false},
   width,
   height: 350,
-  marginRight: 130
+  marginRight: labelMr
 })
 ))
 }});
@@ -341,22 +331,22 @@ Plot.plot({
 <main id="observablehq-main" class="observablehq">
 <div class="observablehq observablehq--block"><!--:9cb0d82a:--></div>
 <div class="observablehq observablehq--block"><!--:40d131f0:--></div>
-<div class="observablehq observablehq--block"><!--:6f5d8587:--></div>
+<div class="observablehq observablehq--block"><!--:33f4e381:--></div>
 <h1 id="" tabindex="-1"><a class="observablehq-header-anchor" href="#"><observablehq-loading></observablehq-loading><!--:8f8e24f6:--></a></h1>
 <p><small>Matchweek <observablehq-loading></observablehq-loading><!--:22beed87:--> · <observablehq-loading></observablehq-loading><!--:1b16b1df:--> clubs · Dixon-Coles model · 10,000 simulations</small></p>
 <hr>
 <h2 id="standings" tabindex="-1"><a class="observablehq-header-anchor" href="#standings">Standings</a></h2>
 <div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:92dddcea:--></div>
 <h2 id="position-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#position-trajectory">Position Trajectory</a></h2>
-<div class="observablehq observablehq--block"><!--:2a7825dc:--></div>
+<div class="observablehq observablehq--block"><!--:8eed031f:--></div>
 <h2 id="title-race" tabindex="-1"><a class="observablehq-header-anchor" href="#title-race">Title Race</a></h2>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:3f3ca3dc:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:01da39fa:--></div>
 <h2 id="relegation-battle" tabindex="-1"><a class="observablehq-header-anchor" href="#relegation-battle">Relegation Battle</a></h2>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:1956301e:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:61488019:--></div>
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="next" href="./positions"><span>Position Grid</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-24T22:49:52">Aug 24, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-24T23:07:39">Aug 24, 2026</a>.</div>
 </footer>
 </div>
 </body>
