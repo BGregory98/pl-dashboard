@@ -240,7 +240,7 @@ display(wrapper);
 return {fmtPct,chg,chgPts,rowCls,tableRows,wrapper};
 }});
 
-define({id: "afb12b0c", inputs: ["sd","Plot","n","clubColor","maxMw","showLabels","short","d3","width","labelMr"], outputs: ["braid"], body: (sd,Plot,n,clubColor,maxMw,showLabels,short,d3,width,labelMr) => {
+define({id: "38f6fb58", inputs: ["sd","Plot","n","clubColor","maxMw","showLabels","short","d3","width","labelMr"], outputs: ["braid"], body: (sd,Plot,n,clubColor,maxMw,showLabels,short,d3,width,labelMr) => {
 const braid = sd.map(d => ({
   ...d,
   pos: d.mw === 0 ? d.exp_pos : d.pos_now
@@ -253,6 +253,7 @@ Plot.plot({
     Plot.line(braid, {
       x: "mw",
       y: "pos",
+      z: "club",
       stroke: d => clubColor(d.club),
       curve: "bump-x",
       strokeWidth: 2.5,
@@ -289,7 +290,7 @@ Plot.plot({
 return {braid};
 }});
 
-define({id: "30448934", inputs: ["sd","d3","maxMw","Plot","n","clubColor","showLabels","short","width","labelMr"], outputs: ["expBraid","expLatest"], body: (sd,d3,maxMw,Plot,n,clubColor,showLabels,short,width,labelMr) => {
+define({id: "d2300271", inputs: ["sd","d3","maxMw","Plot","n","clubColor","showLabels","short","width","labelMr"], outputs: ["expBraid","expLatest"], body: (sd,d3,maxMw,Plot,n,clubColor,showLabels,short,width,labelMr) => {
 const expBraid = (() => {
   const rows = sd.map(d => ({...d, lane: Math.round(d.exp_pos)}));
   const byMw = d3.group(rows, d => d.mw);
@@ -317,6 +318,7 @@ Plot.plot({
     Plot.line(expBraid, {
       x: "mw",
       y: "yPos",
+      z: "club",
       stroke: d => clubColor(d.club),
       curve: "bump-x",
       strokeWidth: 2.5,
@@ -353,13 +355,14 @@ Plot.plot({
 return {expBraid,expLatest};
 }});
 
-define({id: "fa55c5f9", inputs: ["Plot","sd","clubColor","latest","showLabels","short","maxMw","width","n","labelMr","display"], body: async (Plot,sd,clubColor,latest,showLabels,short,maxMw,width,n,labelMr,display) => {
+define({id: "f37abcfb", inputs: ["Plot","sd","clubColor","latest","showLabels","short","maxMw","width","n","labelMr","display"], body: async (Plot,sd,clubColor,latest,showLabels,short,maxMw,width,n,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
     Plot.line(sd, {
       x: "mw",
       y: "exp_pts",
+      z: "club",
       stroke: d => clubColor(d.club),
       strokeWidth: 2.5,
       strokeOpacity: 0.7,
@@ -390,7 +393,7 @@ Plot.plot({
 ))
 }});
 
-define({id: "b0624026", inputs: ["Plot","sd","titleSet","clubColor","latest","showLabels","short","width","labelMr","display"], body: async (Plot,sd,titleSet,clubColor,latest,showLabels,short,width,labelMr,display) => {
+define({id: "b4836c7a", inputs: ["Plot","sd","titleSet","clubColor","latest","showLabels","short","width","labelMr","display"], body: async (Plot,sd,titleSet,clubColor,latest,showLabels,short,width,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
@@ -404,6 +407,7 @@ Plot.plot({
     Plot.line(sd.filter(d => titleSet.has(d.club)), {
       x: "mw",
       y: "p_title",
+      z: "club",
       stroke: d => clubColor(d.club),
       strokeWidth: 2.5,
       title: d => `${d.club}: ${(d.p_title * 100).toFixed(1)}%`
@@ -433,7 +437,7 @@ Plot.plot({
 ))
 }});
 
-define({id: "94f8e40e", inputs: ["Plot","sd","relegSet","clubColor","latest","showLabels","short","width","labelMr","display"], body: async (Plot,sd,relegSet,clubColor,latest,showLabels,short,width,labelMr,display) => {
+define({id: "c82bdd19", inputs: ["Plot","sd","relegSet","clubColor","latest","showLabels","short","width","labelMr","display"], body: async (Plot,sd,relegSet,clubColor,latest,showLabels,short,width,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
@@ -447,6 +451,7 @@ Plot.plot({
     Plot.line(sd.filter(d => relegSet.has(d.club)), {
       x: "mw",
       y: "p_releg",
+      z: "club",
       stroke: d => clubColor(d.club),
       strokeWidth: 2.5,
       title: d => `${d.club}: ${(d.p_releg * 100).toFixed(1)}%`
@@ -551,19 +556,19 @@ Plot.plot({
 <div class="observablehq observablehq--block"><!--:1201e1fe:--></div>
 <hr>
 <h2 id="position-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#position-trajectory">Position Trajectory</a></h2>
-<div class="observablehq observablehq--block"><!--:afb12b0c:--></div>
+<div class="observablehq observablehq--block"><!--:38f6fb58:--></div>
 <h2 id="expected-positions" tabindex="-1"><a class="observablehq-header-anchor" href="#expected-positions">Expected Positions</a></h2>
-<div class="observablehq observablehq--block"><!--:30448934:--></div>
+<div class="observablehq observablehq--block"><!--:d2300271:--></div>
 <h2 id="points-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#points-trajectory">Points Trajectory</a></h2>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:fa55c5f9:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:f37abcfb:--></div>
 <h2 id="title-race" tabindex="-1"><a class="observablehq-header-anchor" href="#title-race">Title Race</a></h2>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:b0624026:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:b4836c7a:--></div>
 <h2 id="relegation-battle" tabindex="-1"><a class="observablehq-header-anchor" href="#relegation-battle">Relegation Battle</a></h2>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:94f8e40e:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:c82bdd19:--></div>
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="next" href="./positions"><span>Position Grid</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-24T23:59:24">Aug 24, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T00:03:24">Aug 25, 2026</a>.</div>
 </footer>
 </div>
 </body>
