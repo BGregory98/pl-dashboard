@@ -7,10 +7,10 @@
 <title>Position Grid | English Football</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
-<link rel="preload" as="style" href="./_observablehq/theme-air.d5b7fcbe.css">
+<link rel="preload" as="style" href="./_observablehq/theme-air,near-midnight.b050d634.css">
 <link rel="preload" as="style" href="./_observablehq/stdlib/inputs.f7bf0e12.css">
 <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
-<link rel="stylesheet" type="text/css" href="./_observablehq/theme-air.d5b7fcbe.css">
+<link rel="stylesheet" type="text/css" href="./_observablehq/theme-air,near-midnight.b050d634.css">
 <link rel="stylesheet" type="text/css" href="./_observablehq/stdlib/inputs.f7bf0e12.css">
 <link rel="modulepreload" href="./_observablehq/client.c543f8ba.js">
 <link rel="modulepreload" href="./_observablehq/runtime.607a8173.js">
@@ -57,6 +57,36 @@
       --theme-foreground: #2a2a26;
       --theme-background: #ffffff;
       --theme-foreground-muted: #6b6b6b;
+      --tbl-border: #eee;
+      --tbl-hover: #f8f8f6;
+      --tbl-top4: #f0f4fa;
+      --tbl-top4h: #e4ecf6;
+      --tbl-releg: #fdf2f0;
+      --tbl-relegh: #f8e8e4;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --theme-foreground: #d5d5d0;
+        --theme-background: #1a1a18;
+        --theme-foreground-muted: #8a8a84;
+        --tbl-border: #2e2e2b;
+        --tbl-hover: #24241f;
+        --tbl-top4: #1a2030;
+        --tbl-top4h: #1e2840;
+        --tbl-releg: #2e1c18;
+        --tbl-relegh: #3a2420;
+      }
+    }
+    :root[data-theme="dark"] {
+      --theme-foreground: #d5d5d0;
+      --theme-background: #1a1a18;
+      --theme-foreground-muted: #8a8a84;
+      --tbl-border: #2e2e2b;
+      --tbl-hover: #24241f;
+      --tbl-top4: #1a2030;
+      --tbl-top4h: #1e2840;
+      --tbl-releg: #2e1c18;
+      --tbl-relegh: #3a2420;
     }
   </style>
 <script type="module">
@@ -148,7 +178,7 @@ html`<img src="${src}" style="max-width:100%;height:auto;" alt="Position grid ${
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="prev" href="./"><span>English Football</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T09:12:54">Aug 25, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T12:01:58">Aug 25, 2026</a>.</div>
 </footer>
 </div>
 </body>
