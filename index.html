@@ -240,7 +240,7 @@ display(wrapper);
 return {fmtPct,chg,chgPts,rowCls,tableRows,wrapper};
 }});
 
-define({id: "38f6fb58", inputs: ["sd","Plot","n","clubColor","maxMw","showLabels","short","d3","width","labelMr"], outputs: ["braid"], body: (sd,Plot,n,clubColor,maxMw,showLabels,short,d3,width,labelMr) => {
+define({id: "11f16de1", inputs: ["sd","Plot","n","maxMw","showLabels","short","d3","colorDomain","colorRange","width","labelMr"], outputs: ["braid"], body: (sd,Plot,n,maxMw,showLabels,short,d3,colorDomain,colorRange,width,labelMr) => {
 const braid = sd.map(d => ({
   ...d,
   pos: d.mw === 0 ? d.exp_pos : d.pos_now
@@ -253,8 +253,7 @@ Plot.plot({
     Plot.line(braid, {
       x: "mw",
       y: "pos",
-      z: "club",
-      stroke: d => clubColor(d.club),
+      stroke: "club",
       curve: "bump-x",
       strokeWidth: 2.5,
       strokeOpacity: 0.7,
@@ -263,7 +262,7 @@ Plot.plot({
     Plot.dot(braid.filter(d => d.mw === maxMw), {
       x: "mw",
       y: "pos",
-      fill: d => clubColor(d.club),
+      fill: "club",
       r: 4
     }),
     showLabels ? Plot.text(braid.filter(d => d.mw === maxMw), {
@@ -282,7 +281,7 @@ Plot.plot({
     domain: [0.5, n + 0.5],
     ticks: d3.range(1, n + 1)
   },
-  color: {legend: false},
+  color: {domain: colorDomain, range: colorRange, legend: false},
   width,
   height: Math.max(500, n * 28),
   marginRight: labelMr
@@ -290,7 +289,7 @@ Plot.plot({
 return {braid};
 }});
 
-define({id: "d2300271", inputs: ["sd","d3","maxMw","Plot","n","clubColor","showLabels","short","width","labelMr"], outputs: ["expBraid","expLatest"], body: (sd,d3,maxMw,Plot,n,clubColor,showLabels,short,width,labelMr) => {
+define({id: "b18164f9", inputs: ["sd","d3","maxMw","Plot","n","showLabels","short","colorDomain","colorRange","width","labelMr"], outputs: ["expBraid","expLatest"], body: (sd,d3,maxMw,Plot,n,showLabels,short,colorDomain,colorRange,width,labelMr) => {
 const expBraid = (() => {
   const rows = sd.map(d => ({...d, lane: Math.round(d.exp_pos)}));
   const byMw = d3.group(rows, d => d.mw);
@@ -318,8 +317,7 @@ Plot.plot({
     Plot.line(expBraid, {
       x: "mw",
       y: "yPos",
-      z: "club",
-      stroke: d => clubColor(d.club),
+      stroke: "club",
       curve: "bump-x",
       strokeWidth: 2.5,
       strokeOpacity: 0.7,
@@ -328,7 +326,7 @@ Plot.plot({
     Plot.dot(expLatest, {
       x: "mw",
       y: "yPos",
-      fill: d => clubColor(d.club),
+      fill: "club",
       r: 4
     }),
     showLabels ? Plot.text(expLatest, {
@@ -347,7 +345,7 @@ Plot.plot({
     domain: [0.5, n + 0.5],
     ticks: d3.range(1, n + 1)
   },
-  color: {legend: false},
+  color: {domain: colorDomain, range: colorRange, legend: false},
   width,
   height: Math.max(500, n * 28),
   marginRight: labelMr
@@ -355,15 +353,14 @@ Plot.plot({
 return {expBraid,expLatest};
 }});
 
-define({id: "f37abcfb", inputs: ["Plot","sd","clubColor","latest","showLabels","short","maxMw","width","n","labelMr","display"], body: async (Plot,sd,clubColor,latest,showLabels,short,maxMw,width,n,labelMr,display) => {
+define({id: "83648b1c", inputs: ["Plot","sd","latest","showLabels","short","maxMw","colorDomain","colorRange","width","n","labelMr","display"], body: async (Plot,sd,latest,showLabels,short,maxMw,colorDomain,colorRange,width,n,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
     Plot.line(sd, {
       x: "mw",
       y: "exp_pts",
-      z: "club",
-      stroke: d => clubColor(d.club),
+      stroke: "club",
       strokeWidth: 2.5,
       strokeOpacity: 0.7,
       title: d => `${d.club}\nMW ${d.mw}: xPts ${d.exp_pts.toFixed(1)}`
@@ -371,7 +368,7 @@ Plot.plot({
     Plot.dot(latest, {
       x: "mw",
       y: "exp_pts",
-      fill: d => clubColor(d.club),
+      fill: "club",
       r: 4
     }),
     showLabels ? Plot.text(latest, {
@@ -385,7 +382,7 @@ Plot.plot({
   ].filter(Boolean),
   x: {label: "Matchweek", domain: [0, Math.max(maxMw + 4, 38)]},
   y: {label: "Projected final points"},
-  color: {legend: false},
+  color: {domain: colorDomain, range: colorRange, legend: false},
   width,
   height: Math.max(400, n * 22),
   marginRight: labelMr
@@ -393,7 +390,7 @@ Plot.plot({
 ))
 }});
 
-define({id: "b4836c7a", inputs: ["Plot","sd","titleSet","clubColor","latest","showLabels","short","width","labelMr","display"], body: async (Plot,sd,titleSet,clubColor,latest,showLabels,short,width,labelMr,display) => {
+define({id: "c61aa14d", inputs: ["Plot","sd","titleSet","latest","showLabels","short","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,sd,titleSet,latest,showLabels,short,colorDomain,colorRange,width,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
@@ -407,15 +404,14 @@ Plot.plot({
     Plot.line(sd.filter(d => titleSet.has(d.club)), {
       x: "mw",
       y: "p_title",
-      z: "club",
-      stroke: d => clubColor(d.club),
+      stroke: "club",
       strokeWidth: 2.5,
       title: d => `${d.club}: ${(d.p_title * 100).toFixed(1)}%`
     }),
     Plot.dot(latest.filter(d => titleSet.has(d.club)), {
       x: "mw",
       y: "p_title",
-      fill: d => clubColor(d.club),
+      fill: "club",
       r: 4
     }),
     showLabels ? Plot.text(latest.filter(d => titleSet.has(d.club)), {
@@ -429,7 +425,7 @@ Plot.plot({
   ].filter(Boolean),
   x: {label: "Matchweek"},
   y: {label: "Title probability", percent: true},
-  color: {legend: false},
+  color: {domain: colorDomain, range: colorRange, legend: false},
   width,
   height: 350,
   marginRight: labelMr
@@ -437,7 +433,7 @@ Plot.plot({
 ))
 }});
 
-define({id: "c82bdd19", inputs: ["Plot","sd","relegSet","clubColor","latest","showLabels","short","width","labelMr","display"], body: async (Plot,sd,relegSet,clubColor,latest,showLabels,short,width,labelMr,display) => {
+define({id: "4284d5dc", inputs: ["Plot","sd","relegSet","latest","showLabels","short","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,sd,relegSet,latest,showLabels,short,colorDomain,colorRange,width,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
@@ -451,15 +447,14 @@ Plot.plot({
     Plot.line(sd.filter(d => relegSet.has(d.club)), {
       x: "mw",
       y: "p_releg",
-      z: "club",
-      stroke: d => clubColor(d.club),
+      stroke: "club",
       strokeWidth: 2.5,
       title: d => `${d.club}: ${(d.p_releg * 100).toFixed(1)}%`
     }),
     Plot.dot(latest.filter(d => relegSet.has(d.club)), {
       x: "mw",
       y: "p_releg",
-      fill: d => clubColor(d.club),
+      fill: "club",
       r: 4
     }),
     showLabels ? Plot.text(latest.filter(d => relegSet.has(d.club)), {
@@ -473,7 +468,7 @@ Plot.plot({
   ].filter(Boolean),
   x: {label: "Matchweek"},
   y: {label: "Relegation probability", percent: true},
-  color: {legend: false},
+  color: {domain: colorDomain, range: colorRange, legend: false},
   width,
   height: 350,
   marginRight: labelMr
@@ -556,19 +551,19 @@ Plot.plot({
 <div class="observablehq observablehq--block"><!--:1201e1fe:--></div>
 <hr>
 <h2 id="position-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#position-trajectory">Position Trajectory</a></h2>
-<div class="observablehq observablehq--block"><!--:38f6fb58:--></div>
+<div class="observablehq observablehq--block"><!--:11f16de1:--></div>
 <h2 id="expected-positions" tabindex="-1"><a class="observablehq-header-anchor" href="#expected-positions">Expected Positions</a></h2>
-<div class="observablehq observablehq--block"><!--:d2300271:--></div>
+<div class="observablehq observablehq--block"><!--:b18164f9:--></div>
 <h2 id="points-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#points-trajectory">Points Trajectory</a></h2>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:f37abcfb:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:83648b1c:--></div>
 <h2 id="title-race" tabindex="-1"><a class="observablehq-header-anchor" href="#title-race">Title Race</a></h2>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:b4836c7a:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:c61aa14d:--></div>
 <h2 id="relegation-battle" tabindex="-1"><a class="observablehq-header-anchor" href="#relegation-battle">Relegation Battle</a></h2>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:c82bdd19:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:4284d5dc:--></div>
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="next" href="./positions"><span>Position Grid</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T00:03:24">Aug 25, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T00:10:10">Aug 25, 2026</a>.</div>
 </footer>
 </div>
 </body>
