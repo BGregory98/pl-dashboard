@@ -84,7 +84,7 @@ const season = view(Inputs.select(seasons.toReversed(), {
 return {season};
 }});
 
-define({id: "5e18fc37", inputs: ["season","summary","d3","width"], outputs: ["endYear","sd","mws","maxMw","prevMw","latest","prev","prevMap","n","SHORT","short","CLUB_COLORS","clubColor","labelMr","showLabels","clubs","colorDomain","colorRange","titleSet","relegSet"], body: (season,summary,d3,width) => {
+define({id: "4ffef822", inputs: ["season","summary","d3","width"], outputs: ["endYear","sd","mws","maxMw","prevMw","latest","prev","prevMap","n","SHORT","short","CLUB_COLORS","clubColor","labelMr","showLabels","clubs","colorDomain","colorRange","xDomain","titleSet","relegSet"], body: (season,summary,d3,width) => {
 const endYear = parseInt(season.split("-")[0]) + 1;
 const sd = summary.filter(d => d.season_end_year === endYear);
 const mws = [...new Set(sd.map(d => d.mw))].sort((a, b) => a - b);
@@ -164,9 +164,11 @@ const clubs = [...new Set(sd.map(d => d.club))].sort();
 const colorDomain = clubs;
 const colorRange = clubs.map(clubColor);
 
+const xDomain = [0, Math.max(maxMw + 4, 38)];
+
 const titleSet = new Set(sd.filter(d => d.p_title > 0.01).map(d => d.club));
 const relegSet = new Set(sd.filter(d => d.p_releg > 0.05).map(d => d.club));
-return {endYear,sd,mws,maxMw,prevMw,latest,prev,prevMap,n,SHORT,short,CLUB_COLORS,clubColor,labelMr,showLabels,clubs,colorDomain,colorRange,titleSet,relegSet};
+return {endYear,sd,mws,maxMw,prevMw,latest,prev,prevMap,n,SHORT,short,CLUB_COLORS,clubColor,labelMr,showLabels,clubs,colorDomain,colorRange,xDomain,titleSet,relegSet};
 }});
 
 define({id: "8f8e24f6", mode: "inline", inputs: ["season","display"], body: async (season,display) => {
@@ -240,12 +242,13 @@ display(wrapper);
 return {fmtPct,chg,chgPts,rowCls,tableRows,wrapper};
 }});
 
-define({id: "11f16de1", inputs: ["sd","Plot","n","maxMw","showLabels","short","d3","colorDomain","colorRange","width","labelMr"], outputs: ["braid"], body: (sd,Plot,n,maxMw,showLabels,short,d3,colorDomain,colorRange,width,labelMr) => {
-const braid = sd.map(d => ({
-  ...d,
-  pos: d.mw === 0 ? d.exp_pos : d.pos_now
-}));
+define({id: "282a376d", inputs: ["sd"], outputs: ["braid"], body: (sd) => {
+const braid = sd.filter(d => d.mw > 0).map(d => ({...d, pos: d.pos_now}));
+return {braid};
+}});
 
+define({id: "93d11226", inputs: ["Plot","n","braid","maxMw","showLabels","short","xDomain","d3","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,n,braid,maxMw,showLabels,short,xDomain,d3,colorDomain,colorRange,width,labelMr,display) => {
+display(await(
 Plot.plot({
   marks: [
     Plot.ruleY([4.5], {stroke: "#4a90d9", strokeOpacity: 0.2}),
@@ -274,7 +277,7 @@ Plot.plot({
       fontSize: 11
     }) : null
   ].filter(Boolean),
-  x: {label: "Matchweek", domain: [0, Math.max(maxMw + 4, 38)]},
+  x: {label: "Matchweek", domain: xDomain},
   y: {
     reverse: true,
     label: "Position",
@@ -286,10 +289,10 @@ Plot.plot({
   height: Math.max(500, n * 28),
   marginRight: labelMr
 })
-return {braid};
+))
 }});
 
-define({id: "b18164f9", inputs: ["sd","d3","maxMw","Plot","n","showLabels","short","colorDomain","colorRange","width","labelMr"], outputs: ["expBraid","expLatest"], body: (sd,d3,maxMw,Plot,n,showLabels,short,colorDomain,colorRange,width,labelMr) => {
+define({id: "c6ebd820", inputs: ["sd","d3","maxMw"], outputs: ["expBraid","expLatest"], body: (sd,d3,maxMw) => {
 const expBraid = (() => {
   const rows = sd.map(d => ({...d, lane: Math.round(d.exp_pos)}));
   const byMw = d3.group(rows, d => d.mw);
@@ -307,9 +310,12 @@ const expBraid = (() => {
   }
   return out;
 })();
-
 const expLatest = expBraid.filter(d => d.mw === maxMw);
+return {expBraid,expLatest};
+}});
 
+define({id: "7f0c522e", inputs: ["Plot","n","expBraid","expLatest","showLabels","short","xDomain","d3","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,n,expBraid,expLatest,showLabels,short,xDomain,d3,colorDomain,colorRange,width,labelMr,display) => {
+display(await(
 Plot.plot({
   marks: [
     Plot.ruleY([4.5], {stroke: "#4a90d9", strokeOpacity: 0.2}),
@@ -338,7 +344,7 @@ Plot.plot({
       fontSize: 11
     }) : null
   ].filter(Boolean),
-  x: {label: "Matchweek", domain: [0, Math.max(maxMw + 4, 38)]},
+  x: {label: "Matchweek", domain: xDomain},
   y: {
     reverse: true,
     label: "Expected final position",
@@ -350,10 +356,10 @@ Plot.plot({
   height: Math.max(500, n * 28),
   marginRight: labelMr
 })
-return {expBraid,expLatest};
+))
 }});
 
-define({id: "83648b1c", inputs: ["Plot","sd","latest","showLabels","short","maxMw","colorDomain","colorRange","width","n","labelMr","display"], body: async (Plot,sd,latest,showLabels,short,maxMw,colorDomain,colorRange,width,n,labelMr,display) => {
+define({id: "58ec7f22", inputs: ["Plot","sd","latest","showLabels","short","xDomain","colorDomain","colorRange","width","n","labelMr","display"], body: async (Plot,sd,latest,showLabels,short,xDomain,colorDomain,colorRange,width,n,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
@@ -380,7 +386,7 @@ Plot.plot({
       fontSize: 11
     }) : null
   ].filter(Boolean),
-  x: {label: "Matchweek", domain: [0, Math.max(maxMw + 4, 38)]},
+  x: {label: "Matchweek", domain: xDomain},
   y: {label: "Projected final points"},
   color: {domain: colorDomain, range: colorRange, legend: false},
   width,
@@ -390,7 +396,7 @@ Plot.plot({
 ))
 }});
 
-define({id: "c61aa14d", inputs: ["Plot","sd","titleSet","latest","showLabels","short","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,sd,titleSet,latest,showLabels,short,colorDomain,colorRange,width,labelMr,display) => {
+define({id: "dba0c7a9", inputs: ["Plot","sd","titleSet","latest","showLabels","short","xDomain","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,sd,titleSet,latest,showLabels,short,xDomain,colorDomain,colorRange,width,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
@@ -423,7 +429,7 @@ Plot.plot({
       fontSize: 11
     }) : null
   ].filter(Boolean),
-  x: {label: "Matchweek"},
+  x: {label: "Matchweek", domain: xDomain},
   y: {label: "Title probability", percent: true},
   color: {domain: colorDomain, range: colorRange, legend: false},
   width,
@@ -433,7 +439,7 @@ Plot.plot({
 ))
 }});
 
-define({id: "4284d5dc", inputs: ["Plot","sd","relegSet","latest","showLabels","short","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,sd,relegSet,latest,showLabels,short,colorDomain,colorRange,width,labelMr,display) => {
+define({id: "997021de", inputs: ["Plot","sd","relegSet","latest","showLabels","short","xDomain","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,sd,relegSet,latest,showLabels,short,xDomain,colorDomain,colorRange,width,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
@@ -466,7 +472,7 @@ Plot.plot({
       fontSize: 11
     }) : null
   ].filter(Boolean),
-  x: {label: "Matchweek"},
+  x: {label: "Matchweek", domain: xDomain},
   y: {label: "Relegation probability", percent: true},
   color: {domain: colorDomain, range: colorRange, legend: false},
   width,
@@ -543,7 +549,7 @@ Plot.plot({
 </style>
 <div class="observablehq observablehq--block"><!--:9cb0d82a:--></div>
 <div class="observablehq observablehq--block"><!--:40d131f0:--></div>
-<div class="observablehq observablehq--block"><!--:5e18fc37:--></div>
+<div class="observablehq observablehq--block"><!--:4ffef822:--></div>
 <h1 id="" tabindex="-1"><a class="observablehq-header-anchor" href="#"><observablehq-loading></observablehq-loading><!--:8f8e24f6:--></a></h1>
 <p><small>Matchweek <observablehq-loading></observablehq-loading><!--:22beed87:--> · <observablehq-loading></observablehq-loading><!--:1b16b1df:--> clubs · Dixon-Coles model · 10,000 simulations</small></p>
 <hr>
@@ -551,19 +557,21 @@ Plot.plot({
 <div class="observablehq observablehq--block"><!--:1201e1fe:--></div>
 <hr>
 <h2 id="position-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#position-trajectory">Position Trajectory</a></h2>
-<div class="observablehq observablehq--block"><!--:11f16de1:--></div>
+<div class="observablehq observablehq--block"><!--:282a376d:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:93d11226:--></div>
 <h2 id="expected-positions" tabindex="-1"><a class="observablehq-header-anchor" href="#expected-positions">Expected Positions</a></h2>
-<div class="observablehq observablehq--block"><!--:b18164f9:--></div>
+<div class="observablehq observablehq--block"><!--:c6ebd820:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:7f0c522e:--></div>
 <h2 id="points-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#points-trajectory">Points Trajectory</a></h2>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:83648b1c:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:58ec7f22:--></div>
 <h2 id="title-race" tabindex="-1"><a class="observablehq-header-anchor" href="#title-race">Title Race</a></h2>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:c61aa14d:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:dba0c7a9:--></div>
 <h2 id="relegation-battle" tabindex="-1"><a class="observablehq-header-anchor" href="#relegation-battle">Relegation Battle</a></h2>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:4284d5dc:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:997021de:--></div>
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="next" href="./positions"><span>Position Grid</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T00:10:10">Aug 25, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T00:21:18">Aug 25, 2026</a>.</div>
 </footer>
 </div>
 </body>
