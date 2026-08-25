@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="generator" content="Observable Framework v1.13.4">
+<title>Position Grid | English Football</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
+<link rel="preload" as="style" href="./_observablehq/theme-air.d5b7fcbe.css">
+<link rel="preload" as="style" href="./_observablehq/stdlib/inputs.f7bf0e12.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
+<link rel="stylesheet" type="text/css" href="./_observablehq/theme-air.d5b7fcbe.css">
+<link rel="stylesheet" type="text/css" href="./_observablehq/stdlib/inputs.f7bf0e12.css">
+<link rel="modulepreload" href="./_observablehq/client.c543f8ba.js">
+<link rel="modulepreload" href="./_observablehq/runtime.607a8173.js">
+<link rel="modulepreload" href="./_observablehq/stdlib.81cd90e3.js">
+<link rel="modulepreload" href="./_npm/d3@7.9.0/080cf928.js">
+<link rel="modulepreload" href="./_npm/htl@1.0.0/11521f02.js">
+<link rel="modulepreload" href="./_observablehq/stdlib/inputs.8ddbf299.js">
+<link rel="modulepreload" href="./_npm/@observablehq/plot@0.6.17/93ce672e.js">
+<link rel="modulepreload" href="./_npm/isoformat@0.2.1/604cb63b.js">
+<link rel="modulepreload" href="./_npm/d3-array@3.2.4/b8e751b6.js">
+<link rel="modulepreload" href="./_npm/d3-axis@3.0.0/c662ea05.js">
+<link rel="modulepreload" href="./_npm/d3-brush@3.0.0/d162d8c6.js">
+<link rel="modulepreload" href="./_npm/d3-chord@3.0.1/5cedd0be.js">
+<link rel="modulepreload" href="./_npm/d3-color@3.1.0/65d51007.js">
+<link rel="modulepreload" href="./_npm/d3-contour@4.0.2/c576a91a.js">
+<link rel="modulepreload" href="./_npm/d3-delaunay@6.0.4/8b43826d.js">
+<link rel="modulepreload" href="./_npm/d3-dispatch@3.0.1/3fb06f14.js">
+<link rel="modulepreload" href="./_npm/d3-drag@3.0.0/20b76948.js">
+<link rel="modulepreload" href="./_npm/d3-dsv@3.0.1/097745a2.js">
+<link rel="modulepreload" href="./_npm/d3-ease@3.0.1/8683b012.js">
+<link rel="modulepreload" href="./_npm/d3-fetch@3.0.1/5c319046.js">
+<link rel="modulepreload" href="./_npm/d3-force@3.0.0/33924f3e.js">
+<link rel="modulepreload" href="./_npm/d3-format@3.1.2/8d67a1ae.js">
+<link rel="modulepreload" href="./_npm/d3-geo@3.1.1/8037bd0b.js">
+<link rel="modulepreload" href="./_npm/d3-hierarchy@3.1.2/a9ba0229.js">
+<link rel="modulepreload" href="./_npm/d3-interpolate@3.0.1/e0a47f97.js">
+<link rel="modulepreload" href="./_npm/d3-path@3.1.0/f9e9e0ab.js">
+<link rel="modulepreload" href="./_npm/d3-polygon@3.0.1/2da8eb3b.js">
+<link rel="modulepreload" href="./_npm/d3-quadtree@3.0.1/09002e01.js">
+<link rel="modulepreload" href="./_npm/d3-random@3.0.1/5108797c.js">
+<link rel="modulepreload" href="./_npm/d3-scale@4.0.2/c9f2571b.js">
+<link rel="modulepreload" href="./_npm/d3-scale-chromatic@3.1.0/f3c78e0d.js">
+<link rel="modulepreload" href="./_npm/d3-selection@3.0.0/28717d05.js">
+<link rel="modulepreload" href="./_npm/d3-shape@3.2.0/7c6e2a50.js">
+<link rel="modulepreload" href="./_npm/d3-time@3.1.0/3d1d57c6.js">
+<link rel="modulepreload" href="./_npm/d3-time-format@4.1.0/643581a8.js">
+<link rel="modulepreload" href="./_npm/d3-timer@3.0.1/e99232db.js">
+<link rel="modulepreload" href="./_npm/d3-transition@3.0.1/bd07fd9a.js">
+<link rel="modulepreload" href="./_npm/d3-zoom@3.0.0/d09f7cc9.js">
+<link rel="modulepreload" href="./_npm/interval-tree-1d@1.0.4/f53f17b2.js">
+<link rel="modulepreload" href="./_npm/internmap@2.0.3/af036d7e.js">
+<link rel="modulepreload" href="./_npm/delaunator@5.1.0/7b06abe7.js">
+<link rel="modulepreload" href="./_npm/binary-search-bounds@2.0.5/5f640032.js">
+<link rel="modulepreload" href="./_npm/robust-predicates@3.0.3/b42f30a7.js">
+<style>
+    :root {
+      --theme-foreground: #2a2a26;
+      --theme-background: #ffffff;
+      --theme-foreground-muted: #6b6b6b;
+    }
+  </style>
+<script type="module">
+
+import {define} from "./_observablehq/client.c543f8ba.js";
+import {registerFile} from "./_observablehq/stdlib.81cd90e3.js";
+
+registerFile("./data/positions.json", {"name":"./data/positions.json","mimeType":"application/json","path":"./_file/data/positions.e802c80b.json","lastModified":1787625997154,"size":3056664});
+registerFile("./data/seasons.json", {"name":"./data/seasons.json","mimeType":"application/json","path":"./_file/data/seasons.3375a9bd.json","lastModified":1787625417771,"size":351});
+
+define({id: "2b1f4f21", inputs: ["FileAttachment"], outputs: ["positions","seasons"], body: (FileAttachment) => {
+const positions = FileAttachment("./data/positions.json").json();
+const seasons = FileAttachment("./data/seasons.json").json();
+return {positions,seasons};
+}});
+
+define({id: "40d131f0", inputs: ["view","Inputs","seasons"], outputs: ["season"], body: (view,Inputs,seasons) => {
+const season = view(Inputs.select(seasons.toReversed(), {
+  value: seasons.at(-1),
+  label: "Season"
+}));
+return {season};
+}});
+
+define({id: "c7fa07fd", inputs: ["positions","season"], outputs: ["sd","mws","clubs","nClubs","SHORT","short"], body: (positions,season) => {
+const sd = positions[season];
+const mws = sd.mws;
+const clubs = sd.clubs;
+const nClubs = clubs.length;
+
+const SHORT = new Map([
+  ["AFC Bournemouth", "Bournemouth"],
+  ["Brighton & Hove Albion", "Brighton"],
+  ["Manchester City", "Man City"],
+  ["Manchester United", "Man Utd"],
+  ["Newcastle United", "Newcastle"],
+  ["Nottingham Forest", "Nott'm Forest"],
+  ["Tottenham Hotspur", "Spurs"],
+  ["Sheffield Wednesday", "Sheff Wed"],
+  ["Sheffield United", "Sheff Utd"],
+  ["West Bromwich Albion", "West Brom"],
+  ["West Ham United", "West Ham"],
+  ["Wolverhampton Wanderers", "Wolves"],
+  ["Queens Park Rangers", "QPR"],
+  ["Bolton Wanderers", "Bolton"],
+  ["Blackburn Rovers", "Blackburn"],
+  ["Huddersfield Town", "Huddersfield"],
+  ["Leicester City", "Leicester"],
+  ["Coventry City", "Coventry"],
+  ["Hull City", "Hull"],
+  ["Ipswich Town", "Ipswich"],
+  ["Leeds United", "Leeds"],
+  ["Stoke City", "Stoke"],
+  ["Swansea City", "Swansea"],
+  ["Cardiff City", "Cardiff"],
+  ["Norwich City", "Norwich"],
+  ["Derby County", "Derby"],
+  ["Middlesbrough", "Boro"],
+]);
+const short = name => SHORT.get(name) ?? name;
+return {sd,mws,clubs,nClubs,SHORT,short};
+}});
+
+define({id: "8f8e24f6", mode: "inline", inputs: ["season","display"], body: async (season,display) => {
+display(await(
+season
+))
+}});
+
+define({id: "71329a16", inputs: ["view","Inputs","d3","mws"], outputs: ["mw"], body: (view,Inputs,d3,mws) => {
+const mw = view(Inputs.range([d3.min(mws), d3.max(mws)], {
+  step: 1,
+  value: d3.max(mws),
+  label: "Matchweek"
+}));
+return {mw};
+}});
+
+define({id: "229401d1", inputs: ["view","Inputs"], outputs: ["mode"], body: (view,Inputs) => {
+const mode = view(Inputs.radio(["Probability", "Change"], {value: "Probability"}));
+return {mode};
+}});
+
+define({id: "93434a8b", inputs: ["sd","mw","clubs","mws","mode","nClubs"], outputs: ["matrix","sorted","prevMwIdx","prevMw","prevMatrix","showChange","gridData","sortedClubs"], body: (sd,mw,clubs,mws,mode,nClubs) => {
+const matrix = sd.grid[mw];
+
+const sorted = clubs.map((club, ci) => ({
+  club,
+  ci,
+  ep: matrix[ci].reduce((sum, p, pi) => sum + p * (pi + 1), 0)
+})).sort((a, b) => a.ep - b.ep);
+
+const prevMwIdx = mws.indexOf(mw);
+const prevMw = prevMwIdx > 0 ? mws[prevMwIdx - 1] : null;
+const prevMatrix = prevMw !== null ? sd.grid[prevMw] : null;
+const showChange = mode === "Change" && prevMatrix !== null;
+
+const gridData = sorted.flatMap(({club, ci}) =>
+  Array.from({length: nClubs}, (_, pi) => {
+    const p = matrix[ci][pi];
+    const pp = prevMatrix ? prevMatrix[ci][pi] : 0;
+    return {club, pos: pi + 1, p, dp: prevMatrix ? p - pp : 0};
+  })
+);
+
+const sortedClubs = sorted.map(d => d.club);
+return {matrix,sorted,prevMwIdx,prevMw,prevMatrix,showChange,gridData,sortedClubs};
+}});
+
+define({id: "b7e53059", mode: "inline", inputs: ["showChange","prevMw","mw","display"], body: async (showChange,prevMw,mw,display) => {
+display(await(
+showChange ? `Change from matchweek ${prevMw} → ${mw}` : `Matchweek ${mw}`
+))
+}});
+
+define({id: "a4118327", mode: "inline", inputs: ["mode","prevMatrix","html","display"], body: async (mode,prevMatrix,html,display) => {
+display(await(
+mode === "Change" && !prevMatrix ? html`<div style="padding:8px 12px;background:#fff3cd;border-radius:4px;margin-bottom:12px;font-size:14px">No previous matchweek — showing probabilities.</div>` : ""
+))
+}});
+
+define({id: "4d00cf99", inputs: ["showChange","d3","gridData","Plot","nClubs","sortedClubs","short","width"], outputs: ["fillField","maxP","maxDp","colorConfig","textThreshold","textFilter","textLabel"], body: (showChange,d3,gridData,Plot,nClubs,sortedClubs,short,width) => {
+const fillField = showChange ? "dp" : "p";
+
+const maxP = d3.max(gridData, d => d.p);
+const maxDp = d3.max(gridData, d => Math.abs(d.dp)) || 0.01;
+
+const colorConfig = showChange
+  ? {scheme: "RdBu", domain: [-maxDp, maxDp], pivot: 0, legend: true, label: "Δ probability"}
+  : {scheme: "YlGnBu", domain: [0, maxP], legend: true, label: "Probability"};
+
+const textThreshold = showChange ? 0.005 : 0.01;
+const textFilter = d => showChange ? Math.abs(d.dp) >= textThreshold : d.p >= textThreshold;
+const textLabel = d => showChange
+  ? `${d.dp > 0 ? "+" : ""}${Math.round(d.dp * 100)}`
+  : `${Math.round(d.p * 100)}`;
+
+Plot.plot({
+  marks: [
+    Plot.cell(gridData, {
+      x: "pos",
+      y: "club",
+      fill: fillField,
+      inset: 1,
+      tip: true,
+      channels: {
+        Probability: d => `${(d.p * 100).toFixed(1)}%`,
+        Change: d => `${d.dp >= 0 ? "+" : ""}${(d.dp * 100).toFixed(1)}%`
+      }
+    }),
+    Plot.text(gridData.filter(textFilter), {
+      x: "pos",
+      y: "club",
+      text: textLabel,
+      fill: d => {
+        const v = showChange ? Math.abs(d.dp) : d.p;
+        return v > 0.25 ? "white" : "#333";
+      },
+      fontSize: 10,
+      fontWeight: 500
+    })
+  ],
+  x: {
+    label: "Finishing position",
+    domain: d3.range(1, nClubs + 1),
+    padding: 0,
+    tickFormat: d => d
+  },
+  y: {
+    label: null,
+    domain: sortedClubs,
+    padding: 0,
+    tickFormat: d => short(d)
+  },
+  color: colorConfig,
+  width: Math.min(width, 960),
+  height: nClubs * 32 + 80,
+  marginLeft: 140,
+  marginBottom: 40
+})
+return {fillField,maxP,maxDp,colorConfig,textThreshold,textFilter,textLabel};
+}});
+
+</script>
+</head>
+<body>
+<input id="observablehq-sidebar-toggle" type="checkbox" title="Toggle sidebar">
+<label id="observablehq-sidebar-backdrop" for="observablehq-sidebar-toggle"></label>
+<nav id="observablehq-sidebar">
+  <ol>
+    <label id="observablehq-sidebar-close" for="observablehq-sidebar-toggle"></label>
+    <li class="observablehq-link"><a href="./">English Football</a></li>
+  </ol>
+  <ol>
+    <li class="observablehq-link observablehq-link-active"><a href="./positions">Position Grid</a></li>
+  </ol>
+</nav>
+<script>{const e=document.querySelector("#observablehq-sidebar"),o=document.querySelector("#observablehq-sidebar-toggle"),r=sessionStorage.getItem("observablehq-sidebar");r?o.checked=r==="true":o.indeterminate=!0;for(const t of document.querySelectorAll("#observablehq-sidebar summary")){const s=t.parentElement;switch(sessionStorage.getItem(`observablehq-sidebar:${t.textContent}`)){case"true":s.open=!0;break;case"false":s.classList.contains("observablehq-section-active")||(s.open=!1);break}}addEventListener("beforeunload",()=>sessionStorage.setItem("observablehq-sidebar-scrolly",`${e.scrollTop}`));const a=sessionStorage.getItem("observablehq-sidebar-scrolly");a!=null&&(e.style.cssText="overflow: hidden;",e.scrollTop=+a,e.style.cssText="");}</script>
+<div id="observablehq-center">
+<main id="observablehq-main" class="observablehq">
+<div class="observablehq observablehq--block"><!--:2b1f4f21:--></div>
+<div class="observablehq observablehq--block"><!--:40d131f0:--></div>
+<div class="observablehq observablehq--block"><!--:c7fa07fd:--></div>
+<h1 id="position-grid" tabindex="-1"><a class="observablehq-header-anchor" href="#position-grid">Position Grid — <observablehq-loading></observablehq-loading><!--:8f8e24f6:--></a></h1>
+<div class="observablehq observablehq--block"><!--:71329a16:--></div>
+<div class="observablehq observablehq--block"><!--:229401d1:--></div>
+<div class="observablehq observablehq--block"><!--:93434a8b:--></div>
+<p><small><observablehq-loading></observablehq-loading><!--:b7e53059:--> · each row sums to 100%</small></p>
+<p><observablehq-loading></observablehq-loading><!--:a4118327:--></p>
+<div class="observablehq observablehq--block"><!--:4d00cf99:--></div>
+</main>
+<footer id="observablehq-footer">
+<nav><a rel="prev" href="./"><span>English Football</span></a></nav>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-24T22:49:52">Aug 24, 2026</a>.</div>
+</footer>
+</div>
+</body>
+</html>
