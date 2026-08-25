@@ -143,8 +143,9 @@
 import {define} from "./_observablehq/client.c543f8ba.js";
 import {registerFile} from "./_observablehq/stdlib.81cd90e3.js";
 
-registerFile("./data/seasons.json", {"name":"./data/seasons.json","mimeType":"application/json","path":"./_file/data/seasons.3375a9bd.json","lastModified":1787625417771,"size":351});
-registerFile("./data/summary.csv", {"name":"./data/summary.csv","mimeType":"text/csv","path":"./_file/data/summary.33c36dda.csv","lastModified":1787626196615,"size":4576305});
+registerFile("./data/fixtures.csv", {"name":"./data/fixtures.csv","mimeType":"text/csv","path":"./_file/data/fixtures.8aee8aa2.csv","lastModified":1787688662285,"size":804});
+registerFile("./data/seasons.json", {"name":"./data/seasons.json","mimeType":"application/json","path":"./_file/data/seasons.3375a9bd.json","lastModified":1787688661671,"size":351});
+registerFile("./data/summary.csv", {"name":"./data/summary.csv","mimeType":"text/csv","path":"./_file/data/summary.aecb7726.csv","lastModified":1787688662080,"size":4657706});
 
 define({id: "f3935fbc", outputs: ["themeBtn","root","getTheme","updateIcon"], body: () => {
 const themeBtn = document.createElement("button");
@@ -164,10 +165,11 @@ document.body.appendChild(themeBtn);
 return {themeBtn,root,getTheme,updateIcon};
 }});
 
-define({id: "9cb0d82a", inputs: ["FileAttachment"], outputs: ["seasons","summary"], body: (FileAttachment) => {
+define({id: "0cb5e56d", inputs: ["FileAttachment"], outputs: ["seasons","summary","fixtures"], body: (FileAttachment) => {
 const seasons = FileAttachment("./data/seasons.json").json();
 const summary = FileAttachment("./data/summary.csv").csv({typed: true});
-return {seasons,summary};
+const fixtures = FileAttachment("./data/fixtures.csv").csv();
+return {seasons,summary,fixtures};
 }});
 
 define({id: "40d131f0", inputs: ["view","Inputs","seasons"], outputs: ["season"], body: (view,Inputs,seasons) => {
@@ -303,7 +305,7 @@ n
 ))
 }});
 
-define({id: "32e94101", inputs: ["prevMap","latest","n","short","display"], outputs: ["fmtPct","chg","chgPts","chgVal","rowCls","tableRows","wrapper"], body: (prevMap,latest,n,short,display) => {
+define({id: "c39ec092", inputs: ["prevMap","latest","n","short","display"], outputs: ["fmtPct","chg","chgPts","chgVal","rowCls","hasWDL","tableRows","wrapper"], body: (prevMap,latest,n,short,display) => {
 function fmtPct(v) {
   if (v < 0.001) return '<span class="dim">—</span>';
   if (v >= 0.995) return "99+";
@@ -347,10 +349,14 @@ function rowCls(rank, n) {
   return "";
 }
 
+const hasWDL = latest[0]?.w_now != null;
+
 const tableRows = latest.map((d, i) => `<tr class="${rowCls(i + 1, n)}">
   <td>${i + 1}</td>
   <td>${short(d.club)}</td>
   <td>${d.played}</td>
+  ${hasWDL ? `<td>${d.w_now}</td><td>${d.d_now}</td><td>${d.l_now}</td>
+  <td>${d.gf_now}</td><td>${d.ga_now}</td><td>${d.gd_now >= 0 ? "+" : ""}${d.gd_now}</td>` : ""}
   <td><span class="val">${d.pts_now}</span> ${chgVal(d.pts_now, d.club, "pts_now")}</td>
   <td><span class="val">${d.exp_pts.toFixed(1)}</span> ${chgPts(d.exp_pts, d.club)}</td>
   <td>${fmtPct(d.p_title)} ${chg(d.p_title, d.club, "p_title", false)}</td>
@@ -361,11 +367,58 @@ const tableRows = latest.map((d, i) => `<tr class="${rowCls(i + 1, n)}">
 const wrapper = document.createElement("div");
 wrapper.style.overflowX = "auto";
 wrapper.innerHTML = `<table class="pred-table">
-<thead><tr><th>#</th><th>Club</th><th>Pld</th><th>Pts</th><th>xPts</th><th>Title</th><th>Top 4</th><th>Releg</th></tr></thead>
+<thead><tr><th>#</th><th>Club</th><th>Pld</th>
+${hasWDL ? "<th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th>" : ""}
+<th>Pts</th><th>xPts</th><th>Title</th><th>Top 4</th><th>Releg</th></tr></thead>
 <tbody>${tableRows}</tbody>
 </table>`;
 display(wrapper);
-return {fmtPct,chg,chgPts,chgVal,rowCls,tableRows,wrapper};
+return {fmtPct,chg,chgPts,chgVal,rowCls,hasWDL,tableRows,wrapper};
+}});
+
+define({id: "bbfadadd", mode: "inline", inputs: ["fixtures","display"], body: async (fixtures,display) => {
+display(await(
+fixtures[0]?.matchweek ?? "?"
+))
+}});
+
+define({id: "7d0d495c", inputs: ["d3","fixtures","short","display"], body: (d3,fixtures,short,display) => {
+{
+  const byDate = d3.group(fixtures, d => d.date);
+  const fmt = d => {
+    const dt = new Date(d + "T12:00:00");
+    return dt.toLocaleDateString("en-GB", {weekday: "short", day: "numeric", month: "short"});
+  };
+
+  let rows = "";
+  for (const [date, matches] of byDate) {
+    rows += `<tr><td class="fix-date" colspan="3">${fmt(date)}</td></tr>`;
+    for (const m of matches) {
+      const ph = (m.p_home * 100).toFixed(0);
+      const pd = (m.p_draw * 100).toFixed(0);
+      const pa = (m.p_away * 100).toFixed(0);
+      rows += `<tr>
+        <td class="home-cell">${short(m.home)}</td>
+        <td style="text-align:center">
+          <div class="fix-prob-bar">
+            <span class="ph" style="width:${ph}%">${ph}%</span>
+            <span class="pd" style="width:${pd}%">${pd}%</span>
+            <span class="pa" style="width:${pa}%">${pa}%</span>
+          </div>
+        </td>
+        <td class="away-cell">${short(m.away)}</td>
+      </tr>`;
+    }
+  }
+
+  const wrapper = document.createElement("div");
+  wrapper.style.overflowX = "auto";
+  wrapper.innerHTML = `<table class="fix-table">
+    <thead><tr><th>Home</th><th>H / D / A</th><th>Away</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+  display(wrapper);
+}
 }});
 
 define({id: "282a376d", inputs: ["sd"], outputs: ["braid"], body: (sd) => {
@@ -748,16 +801,81 @@ Plot.plot({
     .pred-table th, .pred-table td { padding: 5px 4px; }
     .pred-table .chg { display: block; margin-left: 0; }
   }
+
+  .fix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+  .fix-table th {
+    background: var(--theme-background, #fff);
+    border-bottom: 2px solid var(--theme-foreground, #2a2a26);
+    padding: 6px 8px;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--theme-foreground-muted, #6b6b6b);
+    white-space: nowrap;
+  }
+  .fix-table th:nth-child(1) { text-align: left; }
+  .fix-table th:nth-child(2) { text-align: right; padding-right: 12px; }
+  .fix-table th:nth-child(3) { text-align: center; }
+  .fix-table th:nth-child(4) { text-align: left; padding-left: 12px; }
+  .fix-table td {
+    padding: 8px 8px;
+    border-bottom: 1px solid var(--tbl-border, #eee);
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  .fix-table tr:hover td { background: var(--tbl-hover, #f8f8f6); }
+  .fix-table .fix-date {
+    font-size: 12px;
+    color: var(--theme-foreground-muted, #6b6b6b);
+    padding: 5px 8px 2px;
+    border-bottom: none;
+  }
+  .fix-table .home-cell { text-align: right; font-weight: 500; padding-right: 12px; }
+  .fix-table .away-cell { text-align: left; font-weight: 500; padding-left: 12px; }
+  .fix-prob-bar {
+    display: flex;
+    width: 180px;
+    height: 22px;
+    border-radius: 3px;
+    overflow: hidden;
+    font-size: 11px;
+    font-weight: 600;
+    margin: 0 auto;
+  }
+  .fix-prob-bar span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    min-width: 0;
+  }
+  .fix-prob-bar .ph { background: #4a90d9; }
+  .fix-prob-bar .pd { background: #999; }
+  .fix-prob-bar .pa { background: #d94a4a; }
+  @media (max-width: 600px) {
+    .fix-table { font-size: 13px; }
+    .fix-prob-bar { width: 120px; height: 20px; font-size: 10px; }
+  }
 </style>
 <div class="observablehq observablehq--block"><!--:f3935fbc:--></div>
-<div class="observablehq observablehq--block"><!--:9cb0d82a:--></div>
+<div class="observablehq observablehq--block"><!--:0cb5e56d:--></div>
 <div class="observablehq observablehq--block"><!--:40d131f0:--></div>
 <div class="observablehq observablehq--block"><!--:b1938df0:--></div>
 <h1 id="" tabindex="-1"><a class="observablehq-header-anchor" href="#"><observablehq-loading></observablehq-loading><!--:8f8e24f6:--></a></h1>
 <p><small>Matchweek <observablehq-loading></observablehq-loading><!--:22beed87:--> · <observablehq-loading></observablehq-loading><!--:1b16b1df:--> clubs · Dixon-Coles model · 10,000 simulations</small></p>
 <hr>
 <h2 id="predictions" tabindex="-1"><a class="observablehq-header-anchor" href="#predictions">Predictions</a></h2>
-<div class="observablehq observablehq--block"><!--:32e94101:--></div>
+<div class="observablehq observablehq--block"><!--:c39ec092:--></div>
+<hr>
+<h2 id="next-fixtures" tabindex="-1"><a class="observablehq-header-anchor" href="#next-fixtures">Next Fixtures</a></h2>
+<p><small>Matchweek <observablehq-loading></observablehq-loading><!--:bbfadadd:--> · Dixon-Coles match probabilities</small></p>
+<div class="observablehq observablehq--block"><!--:7d0d495c:--></div>
 <hr>
 <h2 id="position-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#position-trajectory">Position Trajectory</a></h2>
 <div class="observablehq observablehq--block"><!--:282a376d:--></div>
@@ -777,7 +895,7 @@ Plot.plot({
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="next" href="./positions"><span>Position Grid</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T12:43:12">Aug 25, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T16:10:55">Aug 25, 2026</a>.</div>
 </footer>
 </div>
 </body>
