@@ -16,10 +16,10 @@
 <link rel="modulepreload" href="./_observablehq/runtime.607a8173.js">
 <link rel="modulepreload" href="./_observablehq/stdlib.81cd90e3.js">
 <link rel="modulepreload" href="./_npm/d3@7.9.0/080cf928.js">
-<link rel="modulepreload" href="./_npm/htl@1.0.0/11521f02.js">
 <link rel="modulepreload" href="./_observablehq/stdlib/inputs.8ddbf299.js">
 <link rel="modulepreload" href="./_npm/@observablehq/plot@0.6.17/93ce672e.js">
 <link rel="modulepreload" href="./_npm/d3-dsv@3.0.1/097745a2.js">
+<link rel="modulepreload" href="./_npm/htl@1.0.0/11521f02.js">
 <link rel="modulepreload" href="./_npm/isoformat@0.2.1/604cb63b.js">
 <link rel="modulepreload" href="./_npm/d3-array@3.2.4/b8e751b6.js">
 <link rel="modulepreload" href="./_npm/d3-axis@3.0.0/c662ea05.js">
@@ -153,7 +153,7 @@ n
 ))
 }});
 
-define({id: "336f5865", inputs: ["prevMap","latest","short","display","html"], outputs: ["fmtPct","chg","chgPts","rowCls","tableRows"], body: (prevMap,latest,short,display,html) => {
+define({id: "73880a93", inputs: ["prevMap","latest","short","display"], outputs: ["fmtPct","chg","chgPts","rowCls","tableRows","wrapper"], body: (prevMap,latest,short,display) => {
 function fmtPct(v) {
   if (v < 0.001) return '<span class="dim">—</span>';
   if (v >= 0.995) return "99+";
@@ -197,11 +197,14 @@ const tableRows = latest.map((d, i) => `<tr class="${rowCls(d)}">
   <td>${fmtPct(d.p_releg)} ${chg(d.p_releg, d.club, "p_releg", true)}</td>
 </tr>`).join("\n");
 
-display(html`<div style="overflow-x:auto"><table class="pred-table">
+const wrapper = document.createElement("div");
+wrapper.style.overflowX = "auto";
+wrapper.innerHTML = `<table class="pred-table">
 <thead><tr><th>#</th><th>Club</th><th>xPts</th><th>Title</th><th>Top 4</th><th>Releg</th></tr></thead>
 <tbody>${tableRows}</tbody>
-</table></div>`);
-return {fmtPct,chg,chgPts,rowCls,tableRows};
+</table>`;
+display(wrapper);
+return {fmtPct,chg,chgPts,rowCls,tableRows,wrapper};
 }});
 
 define({id: "8eed031f", inputs: ["sd","Plot","n","maxMw","showLabels","short","d3","width","labelMr"], outputs: ["braid"], body: (sd,Plot,n,maxMw,showLabels,short,d3,width,labelMr) => {
@@ -411,7 +414,7 @@ Plot.plot({
 <p><small>Matchweek <observablehq-loading></observablehq-loading><!--:22beed87:--> · <observablehq-loading></observablehq-loading><!--:1b16b1df:--> clubs · Dixon-Coles model · 10,000 simulations</small></p>
 <hr>
 <h2 id="predictions" tabindex="-1"><a class="observablehq-header-anchor" href="#predictions">Predictions</a></h2>
-<div class="observablehq observablehq--block"><!--:336f5865:--></div>
+<div class="observablehq observablehq--block"><!--:73880a93:--></div>
 <hr>
 <h2 id="position-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#position-trajectory">Position Trajectory</a></h2>
 <div class="observablehq observablehq--block"><!--:8eed031f:--></div>
@@ -422,7 +425,7 @@ Plot.plot({
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="next" href="./positions"><span>Position Grid</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-24T23:39:24">Aug 24, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-24T23:41:17">Aug 24, 2026</a>.</div>
 </footer>
 </div>
 </body>
