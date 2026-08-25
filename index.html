@@ -153,7 +153,7 @@ n
 ))
 }});
 
-define({id: "73880a93", inputs: ["prevMap","latest","short","display"], outputs: ["fmtPct","chg","chgPts","rowCls","tableRows","wrapper"], body: (prevMap,latest,short,display) => {
+define({id: "1201e1fe", inputs: ["prevMap","latest","n","short","display"], outputs: ["fmtPct","chg","chgPts","rowCls","tableRows","wrapper"], body: (prevMap,latest,n,short,display) => {
 function fmtPct(v) {
   if (v < 0.001) return '<span class="dim">—</span>';
   if (v >= 0.995) return "99+";
@@ -181,26 +181,25 @@ function chgPts(cur, club) {
   return `<span class="chg ${cls}">${sign}${d.toFixed(1)}</span>`;
 }
 
-function rowCls(d) {
-  if (d.p_title > 0.05) return "hi-title";
-  if (d.p_top4 > 0.3) return "hi-top4";
-  if (d.p_releg > 0.1) return "hi-releg";
+function rowCls(rank, n) {
+  if (rank <= 5) return "hi-top4";
+  if (rank > n - 3) return "hi-releg";
   return "";
 }
 
-const tableRows = latest.map((d, i) => `<tr class="${rowCls(d)}">
+const tableRows = latest.map((d, i) => `<tr class="${rowCls(i + 1, n)}">
   <td>${i + 1}</td>
   <td>${short(d.club)}</td>
   <td><span class="val">${d.exp_pts.toFixed(1)}</span> ${chgPts(d.exp_pts, d.club)}</td>
   <td>${fmtPct(d.p_title)} ${chg(d.p_title, d.club, "p_title", false)}</td>
-  <td>${fmtPct(d.p_top4)} ${chg(d.p_top4, d.club, "p_top4", false)}</td>
+  <td>${fmtPct(d.p_top5)} ${chg(d.p_top5, d.club, "p_top5", false)}</td>
   <td>${fmtPct(d.p_releg)} ${chg(d.p_releg, d.club, "p_releg", true)}</td>
 </tr>`).join("\n");
 
 const wrapper = document.createElement("div");
 wrapper.style.overflowX = "auto";
 wrapper.innerHTML = `<table class="pred-table">
-<thead><tr><th>#</th><th>Club</th><th>xPts</th><th>Title</th><th>Top 4</th><th>Releg</th></tr></thead>
+<thead><tr><th>#</th><th>Club</th><th>xPts</th><th>Title</th><th>UCL</th><th>Releg</th></tr></thead>
 <tbody>${tableRows}</tbody>
 </table>`;
 display(wrapper);
@@ -414,7 +413,7 @@ Plot.plot({
 <p><small>Matchweek <observablehq-loading></observablehq-loading><!--:22beed87:--> · <observablehq-loading></observablehq-loading><!--:1b16b1df:--> clubs · Dixon-Coles model · 10,000 simulations</small></p>
 <hr>
 <h2 id="predictions" tabindex="-1"><a class="observablehq-header-anchor" href="#predictions">Predictions</a></h2>
-<div class="observablehq observablehq--block"><!--:73880a93:--></div>
+<div class="observablehq observablehq--block"><!--:1201e1fe:--></div>
 <hr>
 <h2 id="position-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#position-trajectory">Position Trajectory</a></h2>
 <div class="observablehq observablehq--block"><!--:8eed031f:--></div>
@@ -425,7 +424,7 @@ Plot.plot({
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="next" href="./positions"><span>Position Grid</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-24T23:41:17">Aug 24, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-24T23:45:43">Aug 24, 2026</a>.</div>
 </footer>
 </div>
 </body>
