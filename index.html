@@ -56,10 +56,8 @@
 <link rel="modulepreload" href="./_npm/binary-search-bounds@2.0.5/5f640032.js">
 <link rel="modulepreload" href="./_npm/robust-predicates@3.0.3/b42f30a7.js">
 <style>
+    /* Default table vars (light) */
     :root {
-      --theme-foreground: #2a2a26;
-      --theme-background: #ffffff;
-      --theme-foreground-muted: #6b6b6b;
       --tbl-border: #eee;
       --tbl-hover: #f8f8f6;
       --tbl-top4: #f0f4fa;
@@ -67,11 +65,10 @@
       --tbl-releg: #fdf2f0;
       --tbl-relegh: #f8e8e4;
     }
+
+    /* System dark (no toggle set) — table vars only; framework handles its own */
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
-        --theme-foreground: #d5d5d0;
-        --theme-background: #1a1a18;
-        --theme-foreground-muted: #8a8a84;
         --tbl-border: #2e2e2b;
         --tbl-hover: #24241f;
         --tbl-top4: #1a2030;
@@ -80,10 +77,59 @@
         --tbl-relegh: #3a2420;
       }
     }
+
+    /* Toggle: force light — override ALL framework vars so sidebar etc respond */
+    :root[data-theme="light"] {
+      --theme-foreground: #1b1e23;
+      --theme-foreground-focus: #3b5fc0;
+      --theme-background-a: #ffffff;
+      --theme-background-b: color-mix(in srgb, var(--theme-foreground) 4%, var(--theme-background-a));
+      --theme-background: var(--theme-background-a);
+      --theme-background-alt: var(--theme-background-b);
+      --theme-foreground-alt: color-mix(in srgb, var(--theme-foreground) 90%, var(--theme-background-a));
+      --theme-foreground-muted: color-mix(in srgb, var(--theme-foreground) 60%, var(--theme-background-a));
+      --theme-foreground-faint: color-mix(in srgb, var(--theme-foreground) 50%, var(--theme-background-a));
+      --theme-foreground-fainter: color-mix(in srgb, var(--theme-foreground) 30%, var(--theme-background-a));
+      --theme-foreground-faintest: color-mix(in srgb, var(--theme-foreground) 14%, var(--theme-background-a));
+      color-scheme: light;
+      --syntax-keyword: #d73a49;
+      --syntax-entity: #6f42c1;
+      --syntax-constant: #005cc5;
+      --syntax-string: #032f62;
+      --syntax-variable: #e36209;
+      --syntax-comment: var(--theme-foreground-muted);
+      --syntax-entity-tag: #22863a;
+      --syntax-storage-modifier-import: #24292e;
+      --tbl-border: #eee;
+      --tbl-hover: #f8f8f6;
+      --tbl-top4: #f0f4fa;
+      --tbl-top4h: #e4ecf6;
+      --tbl-releg: #fdf2f0;
+      --tbl-relegh: #f8e8e4;
+    }
+
+    /* Toggle: force dark — override ALL framework vars so sidebar etc respond */
     :root[data-theme="dark"] {
-      --theme-foreground: #d5d5d0;
-      --theme-background: #1a1a18;
-      --theme-foreground-muted: #8a8a84;
+      --theme-foreground: #dfdfd6;
+      --theme-foreground-focus: oklch(.712564 .257662 265.758);
+      --theme-background-b: #161616;
+      --theme-background-a: color-mix(in srgb, var(--theme-foreground) 4%, var(--theme-background-b));
+      --theme-background: var(--theme-background-a);
+      --theme-background-alt: var(--theme-background-b);
+      --theme-foreground-alt: color-mix(in srgb, var(--theme-foreground) 90%, var(--theme-background-b));
+      --theme-foreground-muted: color-mix(in srgb, var(--theme-foreground) 60%, var(--theme-background-b));
+      --theme-foreground-faint: color-mix(in srgb, var(--theme-foreground) 50%, var(--theme-background-b));
+      --theme-foreground-fainter: color-mix(in srgb, var(--theme-foreground) 30%, var(--theme-background-b));
+      --theme-foreground-faintest: color-mix(in srgb, var(--theme-foreground) 14%, var(--theme-background-b));
+      color-scheme: dark;
+      --syntax-keyword: #ff7b72;
+      --syntax-entity: #d2a8ff;
+      --syntax-constant: #79c0ff;
+      --syntax-string: #a5d6ff;
+      --syntax-variable: #ffa657;
+      --syntax-comment: var(--theme-foreground-muted);
+      --syntax-entity-tag: #7ee787;
+      --syntax-storage-modifier-import: #c9d1d9;
       --tbl-border: #2e2e2b;
       --tbl-hover: #24241f;
       --tbl-top4: #1a2030;
@@ -132,7 +178,7 @@ const season = view(Inputs.select(seasons.toReversed(), {
 return {season};
 }});
 
-define({id: "ad1f3f26", inputs: ["season","summary","d3","width","dark"], outputs: ["endYear","sd","mws","maxMw","prevMw","latest","prev","prevMap","n","SHORT","short","CLUB_COLORS","clubColor","labelMr","showLabels","grey","clubs","colorDomain","colorRange","xDomain","titleSet","relegSet","repel"], body: (season,summary,d3,width,dark) => {
+define({id: "b1938df0", inputs: ["season","summary","d3","width","dark"], outputs: ["endYear","sd","mws","maxMw","prevMw","latest","prev","prevMap","n","SHORT","short","CLUB_COLORS","clubColor","labelMr","showLabels","grey","clubs","colorDomain","colorRange","xDomain","titleSet","relegSet","repel"], body: (season,summary,d3,width,dark) => {
 const endYear = parseInt(season.split("-")[0]) + 1;
 const sd = summary.filter(d => d.season_end_year === endYear);
 const mws = [...new Set(sd.map(d => d.mw))].sort((a, b) => a - b);
@@ -221,10 +267,18 @@ const relegSet = new Set(latest.filter(d => d.p_releg > 0.05).map(d => d.club));
 function repel(data, yKey, gap) {
   const arr = data.map(d => ({...d, _ly: d[yKey]}));
   arr.sort((a, b) => a._ly - b._ly);
-  for (let i = 1; i < arr.length; i++) {
-    if (arr[i]._ly - arr[i - 1]._ly < gap) {
-      arr[i]._ly = arr[i - 1]._ly + gap;
+  if (arr.length < 2) return arr;
+  for (let iter = 0; iter < 20; iter++) {
+    let moved = false;
+    for (let i = 1; i < arr.length; i++) {
+      const overlap = gap - (arr[i]._ly - arr[i - 1]._ly);
+      if (overlap > 0) {
+        arr[i - 1]._ly -= overlap / 2;
+        arr[i]._ly += overlap / 2;
+        moved = true;
+      }
     }
+    if (!moved) break;
   }
   return arr;
 }
@@ -319,7 +373,7 @@ const braid = sd.filter(d => d.mw > 0).map(d => ({...d, pos: d.pos_now}));
 return {braid};
 }});
 
-define({id: "0db5dd11", inputs: ["Plot","n","braid","maxMw","showLabels","short","xDomain","d3","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,n,braid,maxMw,showLabels,short,xDomain,d3,colorDomain,colorRange,width,labelMr,display) => {
+define({id: "a387d2f4", inputs: ["Plot","n","braid","maxMw","showLabels","short","xDomain","d3","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,n,braid,maxMw,showLabels,short,xDomain,d3,colorDomain,colorRange,width,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
@@ -346,7 +400,20 @@ Plot.plot({
       dx: 10,
       textAnchor: "start",
       fontSize: 11
-    }) : null
+    }) : null,
+    Plot.tip(braid, Plot.pointer({
+      x: "mw",
+      y: "pos",
+      stroke: "club",
+      channels: {
+        "Club": {value: d => short(d.club)},
+        "Pos": {value: d => d.pos},
+        "Pts": {value: d => d.pts_now},
+        "GD": {value: d => `${d.gd_now >= 0 ? "+" : ""}${d.gd_now}`},
+        "Played": {value: d => d.played}
+      },
+      format: {stroke: false, x: false, y: false}
+    }))
   ].filter(Boolean),
   x: {label: "Matchweek", domain: xDomain},
   y: {
@@ -379,7 +446,7 @@ const expLatest = expBraid.filter(d => d.mw === maxMw);
 return {expBraid,expLatest};
 }});
 
-define({id: "8df1521b", inputs: ["Plot","n","expBraid","expLatest","showLabels","short","xDomain","d3","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,n,expBraid,expLatest,showLabels,short,xDomain,d3,colorDomain,colorRange,width,labelMr,display) => {
+define({id: "cc0e8c44", inputs: ["Plot","n","expBraid","expLatest","showLabels","short","xDomain","d3","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,n,expBraid,expLatest,showLabels,short,xDomain,d3,colorDomain,colorRange,width,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
@@ -412,11 +479,13 @@ Plot.plot({
       y: "yPos",
       stroke: "club",
       channels: {
+        "Club": {value: d => short(d.club)},
         "xPos": {value: d => d.exp_pos.toFixed(1)},
         "xPts": {value: d => d.exp_pts.toFixed(1)},
         "Title": {value: d => `${(d.p_title * 100).toFixed(1)}%`},
         "Releg": {value: d => `${(d.p_releg * 100).toFixed(1)}%`}
-      }
+      },
+      format: {stroke: false, x: false, y: false}
     }))
   ].filter(Boolean),
   x: {label: "Matchweek", domain: xDomain},
@@ -439,7 +508,7 @@ const ptsLabels = repel(latest, "exp_pts", 1.5);
 return {ptsLabels};
 }});
 
-define({id: "909d1634", inputs: ["Plot","sd","latest","showLabels","ptsLabels","short","xDomain","colorDomain","colorRange","width","n","labelMr","display"], body: async (Plot,sd,latest,showLabels,ptsLabels,short,xDomain,colorDomain,colorRange,width,n,labelMr,display) => {
+define({id: "35aeef07", inputs: ["Plot","sd","latest","showLabels","ptsLabels","short","xDomain","colorDomain","colorRange","width","n","labelMr","display"], body: async (Plot,sd,latest,showLabels,ptsLabels,short,xDomain,colorDomain,colorRange,width,n,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
@@ -469,10 +538,12 @@ Plot.plot({
       y: "exp_pts",
       stroke: "club",
       channels: {
-        "Actual Pts": "pts_now",
+        "Club": {value: d => short(d.club)},
+        "Actual Pts": {value: d => d.pts_now},
         "90% range": {value: d => `${Math.round(d.pts_p05)}–${Math.round(d.pts_p95)}`},
-        "Played": "played"
-      }
+        "Played": {value: d => d.played}
+      },
+      format: {stroke: false, x: false, y: false}
     }))
   ].filter(Boolean),
   x: {label: "Matchweek", domain: xDomain},
@@ -490,7 +561,7 @@ const titleLabels = repel(latest.filter(d => titleSet.has(d.club)), "p_title", 0
 return {titleLabels};
 }});
 
-define({id: "a80f4937", inputs: ["Plot","sd","titleSet","grey","latest","showLabels","titleLabels","short","xDomain","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,sd,titleSet,grey,latest,showLabels,titleLabels,short,xDomain,colorDomain,colorRange,width,labelMr,display) => {
+define({id: "6fd23091", inputs: ["Plot","sd","titleSet","grey","latest","showLabels","titleLabels","short","xDomain","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,sd,titleSet,grey,latest,showLabels,titleLabels,short,xDomain,colorDomain,colorRange,width,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
@@ -526,9 +597,11 @@ Plot.plot({
       y: "p_title",
       stroke: "club",
       channels: {
+        "Club": {value: d => short(d.club)},
         "xPts": {value: d => d.exp_pts.toFixed(1)},
         "Pos": {value: d => d.pos_now || "—"}
-      }
+      },
+      format: {stroke: false, x: false, y: false}
     }))
   ].filter(Boolean),
   x: {label: "Matchweek", domain: xDomain},
@@ -546,7 +619,7 @@ const relegLabels = repel(latest.filter(d => relegSet.has(d.club)), "p_releg", 0
 return {relegLabels};
 }});
 
-define({id: "fbad8276", inputs: ["Plot","sd","relegSet","grey","latest","showLabels","relegLabels","short","xDomain","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,sd,relegSet,grey,latest,showLabels,relegLabels,short,xDomain,colorDomain,colorRange,width,labelMr,display) => {
+define({id: "57c34cd0", inputs: ["Plot","sd","relegSet","grey","latest","showLabels","relegLabels","short","xDomain","colorDomain","colorRange","width","labelMr","display"], body: async (Plot,sd,relegSet,grey,latest,showLabels,relegLabels,short,xDomain,colorDomain,colorRange,width,labelMr,display) => {
 display(await(
 Plot.plot({
   marks: [
@@ -582,9 +655,11 @@ Plot.plot({
       y: "p_releg",
       stroke: "club",
       channels: {
+        "Club": {value: d => short(d.club)},
         "xPts": {value: d => d.exp_pts.toFixed(1)},
         "Pts": {value: d => d.pts_now}
-      }
+      },
+      format: {stroke: false, x: false, y: false}
     }))
   ].filter(Boolean),
   x: {label: "Matchweek", domain: xDomain},
@@ -678,7 +753,7 @@ Plot.plot({
 <div class="observablehq observablehq--block"><!--:f3935fbc:--></div>
 <div class="observablehq observablehq--block"><!--:9cb0d82a:--></div>
 <div class="observablehq observablehq--block"><!--:40d131f0:--></div>
-<div class="observablehq observablehq--block"><!--:ad1f3f26:--></div>
+<div class="observablehq observablehq--block"><!--:b1938df0:--></div>
 <h1 id="" tabindex="-1"><a class="observablehq-header-anchor" href="#"><observablehq-loading></observablehq-loading><!--:8f8e24f6:--></a></h1>
 <p><small>Matchweek <observablehq-loading></observablehq-loading><!--:22beed87:--> · <observablehq-loading></observablehq-loading><!--:1b16b1df:--> clubs · Dixon-Coles model · 10,000 simulations</small></p>
 <hr>
@@ -687,23 +762,23 @@ Plot.plot({
 <hr>
 <h2 id="position-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#position-trajectory">Position Trajectory</a></h2>
 <div class="observablehq observablehq--block"><!--:282a376d:--></div>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:0db5dd11:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:a387d2f4:--></div>
 <h2 id="expected-positions" tabindex="-1"><a class="observablehq-header-anchor" href="#expected-positions">Expected Positions</a></h2>
 <div class="observablehq observablehq--block"><!--:ac3fd42e:--></div>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:8df1521b:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:cc0e8c44:--></div>
 <h2 id="points-trajectory" tabindex="-1"><a class="observablehq-header-anchor" href="#points-trajectory">Points Trajectory</a></h2>
 <div class="observablehq observablehq--block"><!--:b12383de:--></div>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:909d1634:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:35aeef07:--></div>
 <h2 id="title-race" tabindex="-1"><a class="observablehq-header-anchor" href="#title-race">Title Race</a></h2>
 <div class="observablehq observablehq--block"><!--:cc55dbb1:--></div>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:a80f4937:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:6fd23091:--></div>
 <h2 id="relegation-battle" tabindex="-1"><a class="observablehq-header-anchor" href="#relegation-battle">Relegation Battle</a></h2>
 <div class="observablehq observablehq--block"><!--:99663d0d:--></div>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:fbad8276:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:57c34cd0:--></div>
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="next" href="./positions"><span>Position Grid</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T12:26:49">Aug 25, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T12:37:32">Aug 25, 2026</a>.</div>
 </footer>
 </div>
 </body>

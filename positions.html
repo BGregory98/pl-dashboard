@@ -53,10 +53,8 @@
 <link rel="modulepreload" href="./_npm/delaunator@5.1.0/7b06abe7.js">
 <link rel="modulepreload" href="./_npm/robust-predicates@3.0.3/b42f30a7.js">
 <style>
+    /* Default table vars (light) */
     :root {
-      --theme-foreground: #2a2a26;
-      --theme-background: #ffffff;
-      --theme-foreground-muted: #6b6b6b;
       --tbl-border: #eee;
       --tbl-hover: #f8f8f6;
       --tbl-top4: #f0f4fa;
@@ -64,11 +62,10 @@
       --tbl-releg: #fdf2f0;
       --tbl-relegh: #f8e8e4;
     }
+
+    /* System dark (no toggle set) — table vars only; framework handles its own */
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
-        --theme-foreground: #d5d5d0;
-        --theme-background: #1a1a18;
-        --theme-foreground-muted: #8a8a84;
         --tbl-border: #2e2e2b;
         --tbl-hover: #24241f;
         --tbl-top4: #1a2030;
@@ -77,10 +74,59 @@
         --tbl-relegh: #3a2420;
       }
     }
+
+    /* Toggle: force light — override ALL framework vars so sidebar etc respond */
+    :root[data-theme="light"] {
+      --theme-foreground: #1b1e23;
+      --theme-foreground-focus: #3b5fc0;
+      --theme-background-a: #ffffff;
+      --theme-background-b: color-mix(in srgb, var(--theme-foreground) 4%, var(--theme-background-a));
+      --theme-background: var(--theme-background-a);
+      --theme-background-alt: var(--theme-background-b);
+      --theme-foreground-alt: color-mix(in srgb, var(--theme-foreground) 90%, var(--theme-background-a));
+      --theme-foreground-muted: color-mix(in srgb, var(--theme-foreground) 60%, var(--theme-background-a));
+      --theme-foreground-faint: color-mix(in srgb, var(--theme-foreground) 50%, var(--theme-background-a));
+      --theme-foreground-fainter: color-mix(in srgb, var(--theme-foreground) 30%, var(--theme-background-a));
+      --theme-foreground-faintest: color-mix(in srgb, var(--theme-foreground) 14%, var(--theme-background-a));
+      color-scheme: light;
+      --syntax-keyword: #d73a49;
+      --syntax-entity: #6f42c1;
+      --syntax-constant: #005cc5;
+      --syntax-string: #032f62;
+      --syntax-variable: #e36209;
+      --syntax-comment: var(--theme-foreground-muted);
+      --syntax-entity-tag: #22863a;
+      --syntax-storage-modifier-import: #24292e;
+      --tbl-border: #eee;
+      --tbl-hover: #f8f8f6;
+      --tbl-top4: #f0f4fa;
+      --tbl-top4h: #e4ecf6;
+      --tbl-releg: #fdf2f0;
+      --tbl-relegh: #f8e8e4;
+    }
+
+    /* Toggle: force dark — override ALL framework vars so sidebar etc respond */
     :root[data-theme="dark"] {
-      --theme-foreground: #d5d5d0;
-      --theme-background: #1a1a18;
-      --theme-foreground-muted: #8a8a84;
+      --theme-foreground: #dfdfd6;
+      --theme-foreground-focus: oklch(.712564 .257662 265.758);
+      --theme-background-b: #161616;
+      --theme-background-a: color-mix(in srgb, var(--theme-foreground) 4%, var(--theme-background-b));
+      --theme-background: var(--theme-background-a);
+      --theme-background-alt: var(--theme-background-b);
+      --theme-foreground-alt: color-mix(in srgb, var(--theme-foreground) 90%, var(--theme-background-b));
+      --theme-foreground-muted: color-mix(in srgb, var(--theme-foreground) 60%, var(--theme-background-b));
+      --theme-foreground-faint: color-mix(in srgb, var(--theme-foreground) 50%, var(--theme-background-b));
+      --theme-foreground-fainter: color-mix(in srgb, var(--theme-foreground) 30%, var(--theme-background-b));
+      --theme-foreground-faintest: color-mix(in srgb, var(--theme-foreground) 14%, var(--theme-background-b));
+      color-scheme: dark;
+      --syntax-keyword: #ff7b72;
+      --syntax-entity: #d2a8ff;
+      --syntax-constant: #79c0ff;
+      --syntax-string: #a5d6ff;
+      --syntax-variable: #ffa657;
+      --syntax-comment: var(--theme-foreground-muted);
+      --syntax-entity-tag: #7ee787;
+      --syntax-storage-modifier-import: #c9d1d9;
       --tbl-border: #2e2e2b;
       --tbl-hover: #24241f;
       --tbl-top4: #1a2030;
@@ -179,7 +225,7 @@ html`<img src="${src}" style="max-width:100%;height:auto;" alt="Position grid ${
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="prev" href="./"><span>English Football</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T12:26:49">Aug 25, 2026</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2026-08-25T12:37:32">Aug 25, 2026</a>.</div>
 </footer>
 </div>
 </body>
